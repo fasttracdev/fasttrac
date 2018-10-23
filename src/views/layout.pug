@@ -1,17 +1,32 @@
 doctype html
-html
-  head
-    title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
-    link(rel='stylesheet', href='https://www.w3schools.com/w3css/4/w3.css')
-    script(src="https://cdn.auth0.com/js/auth0/8.7/auth0.min.js")
-  body
-    nav.w3-bar.w3-border.w3-light-grey( role="navigation" )
-      .w3-bar-item.w3-text-grey Auth0 - NodeJS
-      a(href="/").w3-bar-item.w3-button Home
-      if loggedIn
-        a(href="/user" ).w3-bar-item.w3-button Profile
-        a(id="qsLogoutBtn" href="/logout").w3-bar-item.w3-button Logout
-      else
-        a(id="qsLoginBtn" href="/login").w3-bar-item.w3-button Login
+html(lang='en')
+    head
+        meta(charset='utf-8')
+        meta(http-equiv='X-UA-Compatible', content='IE=edge')
+        meta(name='viewport', content='width=device-width, initial-scale=1')
+        meta(name='description', content='')
+        meta(name='author', content='')
+        title #{title}
+        // Bootstrap Core CSS
+        link(href='stylesheets/bootstrap/css/bootstrap.min.css', rel='stylesheet')
+        // MetisMenu CSS
+        link(href='stylesheets/metisMenu/metisMenu.min.css', rel='stylesheet')
+        // Custom CSS
+        link(href='stylesheets/sb-admin-2.min.css', rel='stylesheet')
+        // Custom Fonts
+        link(href='stylesheets/font-awesome/css/font-awesome.min.css', rel='stylesheet', type='text/css')
+        link(rel='stylesheet', href='/stylesheets/style.css')
+        script(src="https://cdn.auth0.com/js/auth0/8.7/auth0.min.js")
+        // HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries
+        // WARNING: Respond.js doesn't work if you view the page via file://
+        //if lt IE 9
+          script(src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js')
+          script(src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')
+    
+    body
+        if loggedIn
+            nav.w3-bar.w3-border.w3-light-grey( role="navigation" )
+                a(href="/").w3-bar-item.w3-button Home
+                a(href="/user" ).w3-bar-item.w3-button Profile
+                a(id="qsLogoutBtn" href="/logout").w3-bar-item.w3-button Logout
     block content
