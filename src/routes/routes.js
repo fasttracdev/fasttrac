@@ -1,9 +1,9 @@
-// Frontend Routes
-var indexRouter = require('./src/routes/index');
-var usersRouter = require('./src/routes/users');
+const routes = require('./index');
+const user = require('./user');
+const login = require('./login');
 
 exports = module.exports = function(app) {
-  	//front end
-  	app.use('/', indexRouter);
-	app.use('/users', usersRouter);
+  	app.use('/', routes);
+	app.use('/user', user);
+	app.use('/sso-login', login);
 };

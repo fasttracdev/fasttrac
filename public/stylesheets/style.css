@@ -1,8 +1,19 @@
 body {
-  padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
   color: #00B7FF;
+}
+
+.w3-container a {
+    color: #337ab7;
+    text-decoration: none;
+}
+.login-auth0-btn,
+.login-auth0-btn:hover,
+.login-auth0-btn:active,
+.login-auth0-btn:focus {
+	background-color: rgb(234, 83, 35)!important;
+	border-color: rgb(234, 83, 35)!important;
 }
