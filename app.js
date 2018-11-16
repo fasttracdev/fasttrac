@@ -9,6 +9,8 @@ const dotenv = require('dotenv');
 const passport = require('passport');
 const Auth0Strategy = require('passport-auth0');
 const flash = require('connect-flash');
+const paginate = require('express-paginate');
+var cors = require('cors')
 
 dotenv.load();
 
@@ -65,6 +67,8 @@ app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(flash());
+app.use(cors());
+app.use(paginate.middleware(10, 50));
 
 // Handle auth failure error messages
 app.use(function(req, res, next) {
@@ -79,11 +83,15 @@ app.use(function(req, res, next) {
 
 // Check logged in
 app.use(function(req, res, next) {
-  res.locals.loggedIn = false;
-  if (req.session.passport && typeof req.session.passport.user !== 'undefined') {
-    res.locals.loggedIn = true;
-  }
-  next();
+  // res.locals.loggedIn = false;
+  // if (req.session.passport && typeof req.session.passport.user !== 'undefined') {
+  //   res.locals.loggedIn = true;
+  // }
+
+  // check header or url parameters or post parameters for token
+  var token = req.body.token || req.query.token || req.headers['authorization'];
+  console.log(token);
+  // next();
 });
 
 //setup routes
