@@ -80,6 +80,28 @@ exports.postForExternalRequest = function(url, params){
   });
 }
 
+
+/**
+* Get Request
+*
+* @param [url] [string]
+* @param [params] [object] [Data that pass to url]
+*/
+exports.getForExternalRequest = function (url) {
+  // url = process.env.AUTH0_DOMAIN + url;
+  return new Promise(function (resolve, reject) {
+    axios.get(url)
+      .then(function (response) {
+        resolve(response);
+      })
+      .catch(function (error) {
+        return handleError(error, reject);
+      });
+  });
+}
+
+
+
 /**
 * PATCH Request
 *
