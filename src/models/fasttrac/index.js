@@ -1,4 +1,25 @@
-const con = require('../../../../connection');
+const con = require('../../../connection');
+
+/* Get drivers listing from fasttrac db */ 
+exports.getDriversFromDB = function(query){
+    return new Promise(function (resolve, reject) {
+        let db = con.connectionDB();
+        let sql = "select * from fast_trac_drivers where fasttrac_driver_num like '"+'%'+query+'%'+"'";
+        let params = [
+            query
+        ];
+        db.run(sql, params, function(err) {
+            if (err) {
+                console.log(err);
+                reject(err);
+                return
+            }
+
+            resolve();
+        });
+        db.close();
+    });
+};
 
 /* Insert drivers data */
 exports.insertDriverintoDB = function (data) {
@@ -56,12 +77,15 @@ exports.insertDriverintoDB = function (data) {
               value.created_at
             ], function (err) {
             if (err) {
-              console.log(err.message);
+              reject(err);
+              return;
             }
+
           // console.log((Number(index / data.length)*100) + "% Completed");
           // console.log(`A row has been inserted with rowid ${this.lastID}`);
         });
         });
+        resolve();
       }else {}
     }catch(e) {
 
