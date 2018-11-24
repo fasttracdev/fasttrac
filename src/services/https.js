@@ -1,32 +1,33 @@
 var axios = require('axios');
-
+const management = require('../models/management');
 /**
 * GET Request
 *
 * @param [url] [string]
 */
 exports.get = function(url){
+  return new Promise(function (resolve, reject) {
+    getManagementToken().then(function(success) {
+      url = process.env.AUTH0_DOMAIN + url;
 
-    url = process.env.AUTH0_DOMAIN + url;
+      var headers = {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: success
+        }
+      };
 
-  	var headers = {
-      headers: {
-          'Content-Type': 'application/json',
-          Authorization: "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik56WTRSREpHUkRjM1FVSkRNekkxTkVSRE5ETXhNa1kyTnpNd04wVTFNVFEzTWtZMU5VVkNNUSJ9.eyJpc3MiOiJodHRwczovL2RkeC5hdXRoMC5jb20vIiwic3ViIjoiMndOTm1ldFpBZDFNbmtmanVYVWpMTlY2TzJJUEJjZVFAY2xpZW50cyIsImF1ZCI6Imh0dHBzOi8vZGR4LmF1dGgwLmNvbS9hcGkvdjIvIiwiaWF0IjoxNTQxMjM1MjkzLCJleHAiOjE1NDEzMjE2OTMsImF6cCI6IjJ3Tk5tZXRaQWQxTW5rZmp1WFVqTE5WNk8ySVBCY2VRIiwic2NvcGUiOiJyZWFkOmNsaWVudF9ncmFudHMgY3JlYXRlOmNsaWVudF9ncmFudHMgZGVsZXRlOmNsaWVudF9ncmFudHMgdXBkYXRlOmNsaWVudF9ncmFudHMgcmVhZDp1c2VycyB1cGRhdGU6dXNlcnMgZGVsZXRlOnVzZXJzIGNyZWF0ZTp1c2VycyByZWFkOnVzZXJzX2FwcF9tZXRhZGF0YSB1cGRhdGU6dXNlcnNfYXBwX21ldGFkYXRhIGRlbGV0ZTp1c2Vyc19hcHBfbWV0YWRhdGEgY3JlYXRlOnVzZXJzX2FwcF9tZXRhZGF0YSBjcmVhdGU6dXNlcl90aWNrZXRzIHJlYWQ6Y2xpZW50cyB1cGRhdGU6Y2xpZW50cyBkZWxldGU6Y2xpZW50cyBjcmVhdGU6Y2xpZW50cyByZWFkOmNsaWVudF9rZXlzIHVwZGF0ZTpjbGllbnRfa2V5cyBkZWxldGU6Y2xpZW50X2tleXMgY3JlYXRlOmNsaWVudF9rZXlzIHJlYWQ6Y29ubmVjdGlvbnMgdXBkYXRlOmNvbm5lY3Rpb25zIGRlbGV0ZTpjb25uZWN0aW9ucyBjcmVhdGU6Y29ubmVjdGlvbnMgcmVhZDpyZXNvdXJjZV9zZXJ2ZXJzIHVwZGF0ZTpyZXNvdXJjZV9zZXJ2ZXJzIGRlbGV0ZTpyZXNvdXJjZV9zZXJ2ZXJzIGNyZWF0ZTpyZXNvdXJjZV9zZXJ2ZXJzIHJlYWQ6ZGV2aWNlX2NyZWRlbnRpYWxzIHVwZGF0ZTpkZXZpY2VfY3JlZGVudGlhbHMgZGVsZXRlOmRldmljZV9jcmVkZW50aWFscyBjcmVhdGU6ZGV2aWNlX2NyZWRlbnRpYWxzIHJlYWQ6cnVsZXMgdXBkYXRlOnJ1bGVzIGRlbGV0ZTpydWxlcyBjcmVhdGU6cnVsZXMgcmVhZDpydWxlc19jb25maWdzIHVwZGF0ZTpydWxlc19jb25maWdzIGRlbGV0ZTpydWxlc19jb25maWdzIHJlYWQ6ZW1haWxfcHJvdmlkZXIgdXBkYXRlOmVtYWlsX3Byb3ZpZGVyIGRlbGV0ZTplbWFpbF9wcm92aWRlciBjcmVhdGU6ZW1haWxfcHJvdmlkZXIgYmxhY2tsaXN0OnRva2VucyByZWFkOnN0YXRzIHJlYWQ6dGVuYW50X3NldHRpbmdzIHVwZGF0ZTp0ZW5hbnRfc2V0dGluZ3MgcmVhZDpsb2dzIHJlYWQ6c2hpZWxkcyBjcmVhdGU6c2hpZWxkcyBkZWxldGU6c2hpZWxkcyB1cGRhdGU6dHJpZ2dlcnMgcmVhZDp0cmlnZ2VycyByZWFkOmdyYW50cyBkZWxldGU6Z3JhbnRzIHJlYWQ6Z3VhcmRpYW5fZmFjdG9ycyB1cGRhdGU6Z3VhcmRpYW5fZmFjdG9ycyByZWFkOmd1YXJkaWFuX2Vucm9sbG1lbnRzIGRlbGV0ZTpndWFyZGlhbl9lbnJvbGxtZW50cyBjcmVhdGU6Z3VhcmRpYW5fZW5yb2xsbWVudF90aWNrZXRzIHJlYWQ6dXNlcl9pZHBfdG9rZW5zIGNyZWF0ZTpwYXNzd29yZHNfY2hlY2tpbmdfam9iIGRlbGV0ZTpwYXNzd29yZHNfY2hlY2tpbmdfam9iIHJlYWQ6Y3VzdG9tX2RvbWFpbnMgZGVsZXRlOmN1c3RvbV9kb21haW5zIGNyZWF0ZTpjdXN0b21fZG9tYWlucyByZWFkOmVtYWlsX3RlbXBsYXRlcyBjcmVhdGU6ZW1haWxfdGVtcGxhdGVzIHVwZGF0ZTplbWFpbF90ZW1wbGF0ZXMiLCJndHkiOiJjbGllbnQtY3JlZGVudGlhbHMifQ.sruIgHTuHRsxxJGAX_0OzW4od25tu0rPekmiS4I6X6SqUC9RhPHQGF7HCxyTeqBN2-bmBTC20ckI6OcudntyeVxzc5kMoYDSCylC-AoKvc960gRsWU9mk-Fj5HptzEb3iMfoSXwlJna6kkISPlDK6CgJMbccD--mZE9Zf9LebE1-9_D5IHi-sIcF7InCVGHkmCXk0oixvJCofWVh8r-YqjIpKtr-MnGmSwZ4UMqMnGUfLgX4A_YFAxDay0EJqetfz2atOxe4r6h2TOQYLoO30WBNMp7qBSJTT-8RAz9JgLLlB_F-T-teva9L__Iue1rfCvTHra4hJr5ND8uz9HMidg"
-      }
-    };
-
-
-
-  	return new Promise(function (resolve, reject) {
-	    axios.get(url, headers)
-	    .then(function (response) {
-	        resolve(response);
-	    })
-	    .catch(function (error) {
-	        return handleError(error, reject);
-	    });
-  	});
+      axios.get(url, headers)
+      .then(function (response) {
+          resolve(response);
+      })
+      .catch(function (error) {
+          return handleError(error, reject);
+      });
+    }, function() {
+      return reject();
+    });
+  });
 }
 
 /**
@@ -36,25 +37,28 @@ exports.get = function(url){
 * @param [params] [object] [Data that pass to url]
 */
 exports.post = function(url, params){
+  return new Promise(function (resolve, reject) {
+    getManagementToken().then(function(success) {
+      url = process.env.AUTH0_DOMAIN + url;
 
-    url = process.env.AUTH0_DOMAIN + url;
-
-  	var headers = {
+      var headers = {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik56WTRSREpHUkRjM1FVSkRNekkxTkVSRE5ETXhNa1kyTnpNd04wVTFNVFEzTWtZMU5VVkNNUSJ9.eyJpc3MiOiJodHRwczovL2RkeC5hdXRoMC5jb20vIiwic3ViIjoiMndOTm1ldFpBZDFNbmtmanVYVWpMTlY2TzJJUEJjZVFAY2xpZW50cyIsImF1ZCI6Imh0dHBzOi8vZGR4LmF1dGgwLmNvbS9hcGkvdjIvIiwiaWF0IjoxNTQyMTgwODYzLCJleHAiOjE1NDIyNjcyNjMsImF6cCI6IjJ3Tk5tZXRaQWQxTW5rZmp1WFVqTE5WNk8ySVBCY2VRIiwic2NvcGUiOiJyZWFkOmNsaWVudF9ncmFudHMgY3JlYXRlOmNsaWVudF9ncmFudHMgZGVsZXRlOmNsaWVudF9ncmFudHMgdXBkYXRlOmNsaWVudF9ncmFudHMgcmVhZDp1c2VycyB1cGRhdGU6dXNlcnMgZGVsZXRlOnVzZXJzIGNyZWF0ZTp1c2VycyByZWFkOnVzZXJzX2FwcF9tZXRhZGF0YSB1cGRhdGU6dXNlcnNfYXBwX21ldGFkYXRhIGRlbGV0ZTp1c2Vyc19hcHBfbWV0YWRhdGEgY3JlYXRlOnVzZXJzX2FwcF9tZXRhZGF0YSBjcmVhdGU6dXNlcl90aWNrZXRzIHJlYWQ6Y2xpZW50cyB1cGRhdGU6Y2xpZW50cyBkZWxldGU6Y2xpZW50cyBjcmVhdGU6Y2xpZW50cyByZWFkOmNsaWVudF9rZXlzIHVwZGF0ZTpjbGllbnRfa2V5cyBkZWxldGU6Y2xpZW50X2tleXMgY3JlYXRlOmNsaWVudF9rZXlzIHJlYWQ6Y29ubmVjdGlvbnMgdXBkYXRlOmNvbm5lY3Rpb25zIGRlbGV0ZTpjb25uZWN0aW9ucyBjcmVhdGU6Y29ubmVjdGlvbnMgcmVhZDpyZXNvdXJjZV9zZXJ2ZXJzIHVwZGF0ZTpyZXNvdXJjZV9zZXJ2ZXJzIGRlbGV0ZTpyZXNvdXJjZV9zZXJ2ZXJzIGNyZWF0ZTpyZXNvdXJjZV9zZXJ2ZXJzIHJlYWQ6ZGV2aWNlX2NyZWRlbnRpYWxzIHVwZGF0ZTpkZXZpY2VfY3JlZGVudGlhbHMgZGVsZXRlOmRldmljZV9jcmVkZW50aWFscyBjcmVhdGU6ZGV2aWNlX2NyZWRlbnRpYWxzIHJlYWQ6cnVsZXMgdXBkYXRlOnJ1bGVzIGRlbGV0ZTpydWxlcyBjcmVhdGU6cnVsZXMgcmVhZDpydWxlc19jb25maWdzIHVwZGF0ZTpydWxlc19jb25maWdzIGRlbGV0ZTpydWxlc19jb25maWdzIHJlYWQ6ZW1haWxfcHJvdmlkZXIgdXBkYXRlOmVtYWlsX3Byb3ZpZGVyIGRlbGV0ZTplbWFpbF9wcm92aWRlciBjcmVhdGU6ZW1haWxfcHJvdmlkZXIgYmxhY2tsaXN0OnRva2VucyByZWFkOnN0YXRzIHJlYWQ6dGVuYW50X3NldHRpbmdzIHVwZGF0ZTp0ZW5hbnRfc2V0dGluZ3MgcmVhZDpsb2dzIHJlYWQ6c2hpZWxkcyBjcmVhdGU6c2hpZWxkcyBkZWxldGU6c2hpZWxkcyB1cGRhdGU6dHJpZ2dlcnMgcmVhZDp0cmlnZ2VycyByZWFkOmdyYW50cyBkZWxldGU6Z3JhbnRzIHJlYWQ6Z3VhcmRpYW5fZmFjdG9ycyB1cGRhdGU6Z3VhcmRpYW5fZmFjdG9ycyByZWFkOmd1YXJkaWFuX2Vucm9sbG1lbnRzIGRlbGV0ZTpndWFyZGlhbl9lbnJvbGxtZW50cyBjcmVhdGU6Z3VhcmRpYW5fZW5yb2xsbWVudF90aWNrZXRzIHJlYWQ6dXNlcl9pZHBfdG9rZW5zIGNyZWF0ZTpwYXNzd29yZHNfY2hlY2tpbmdfam9iIGRlbGV0ZTpwYXNzd29yZHNfY2hlY2tpbmdfam9iIHJlYWQ6Y3VzdG9tX2RvbWFpbnMgZGVsZXRlOmN1c3RvbV9kb21haW5zIGNyZWF0ZTpjdXN0b21fZG9tYWlucyByZWFkOmVtYWlsX3RlbXBsYXRlcyBjcmVhdGU6ZW1haWxfdGVtcGxhdGVzIHVwZGF0ZTplbWFpbF90ZW1wbGF0ZXMiLCJndHkiOiJjbGllbnQtY3JlZGVudGlhbHMifQ.MvBuEsfLV7CGOllDVmMS6-IlegydX1zYzMbxLMNsHKRUZSuLVObT7bzbKGshsHWV0jX4TQyGjkUtmG_g8WZ94wp39uIge-znvK3oPwCUW9no9bW2A0PZCZR175umzZ0VXcmlP5ROzT-WLiOaodaUNPeOrfHgBVrJKfYFsTyAltY_AwiHaTECjtsXEV8kYQuUWmo6oMFGaM0VDKQ-7fCNukk0U33omOgQxdsxQzxDzlb8D97uEsJ2XiAN7krlyHuxenfOs_Cc-CVELm6c-h4a57ADRw08XB3CoDnt25zo0l2rgZnujsy8q80StyCkMoShOhlT96DAFoNUJ2wYvpwAbQ"
+          Authorization: success
         }
-    };
+      };
 
-  	return new Promise(function (resolve, reject) {
-	    axios.post(url, params, headers)
-	    .then(function (response) {
-	        resolve(response);
-	    })
-	    .catch(function (error) {
-	        return handleError(error, reject);
-	    });
-  	});
+      axios.post(url, params, headers)
+      .then(function (response) {
+          resolve(response);
+      })
+      .catch(function (error) {
+          return handleError(error, reject);
+      });
+    }, function() {
+      return reject();
+    });
+  });
 }
 
 /**
@@ -64,19 +68,39 @@ exports.post = function(url, params){
 * @param [params] [object] [Data that pass to url]
 */
 exports.postForExternalRequest = function(url, params){
+  url = process.env.AUTH0_DOMAIN + url;
+  return new Promise(function (resolve, reject) {
+    axios.post(url, params)
+    .then(function (response) {
+        resolve(response);
+    })
+    .catch(function (error) {
+        return handleError(error, reject);
+    });
+  });
+}
 
-    url = process.env.AUTH0_DOMAIN + url;
 
-    return new Promise(function (resolve, reject) {
-      axios.post(url, params)
+/**
+* Get Request
+*
+* @param [url] [string]
+* @param [params] [object] [Data that pass to url]
+*/
+exports.getForExternalRequest = function (url) {
+  // url = process.env.AUTH0_DOMAIN + url;
+  return new Promise(function (resolve, reject) {
+    axios.get(url)
       .then(function (response) {
-          resolve(response);
+        resolve(response);
       })
       .catch(function (error) {
-          return handleError(error, reject);
+        return handleError(error, reject);
       });
-    });
+  });
 }
+
+
 
 /**
 * PATCH Request
@@ -85,25 +109,28 @@ exports.postForExternalRequest = function(url, params){
 * @param [params] [object] [Data that pass to url]
 */
 exports.patch = function(url, params){
+  return new Promise(function (resolve, reject) {
+    getManagementToken().then(function(success) {
+      url = process.env.AUTH0_DOMAIN + url;
 
-    url = process.env.AUTH0_DOMAIN + url;
+      var headers = {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: success
+          }
+      };
 
-  	var headers = {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik56WTRSREpHUkRjM1FVSkRNekkxTkVSRE5ETXhNa1kyTnpNd04wVTFNVFEzTWtZMU5VVkNNUSJ9.eyJpc3MiOiJodHRwczovL2RkeC5hdXRoMC5jb20vIiwic3ViIjoiMndOTm1ldFpBZDFNbmtmanVYVWpMTlY2TzJJUEJjZVFAY2xpZW50cyIsImF1ZCI6Imh0dHBzOi8vZGR4LmF1dGgwLmNvbS9hcGkvdjIvIiwiaWF0IjoxNTQyMjY1MTA0LCJleHAiOjE1NDIzNTE1MDQsImF6cCI6IjJ3Tk5tZXRaQWQxTW5rZmp1WFVqTE5WNk8ySVBCY2VRIiwic2NvcGUiOiJyZWFkOmNsaWVudF9ncmFudHMgY3JlYXRlOmNsaWVudF9ncmFudHMgZGVsZXRlOmNsaWVudF9ncmFudHMgdXBkYXRlOmNsaWVudF9ncmFudHMgcmVhZDp1c2VycyB1cGRhdGU6dXNlcnMgZGVsZXRlOnVzZXJzIGNyZWF0ZTp1c2VycyByZWFkOnVzZXJzX2FwcF9tZXRhZGF0YSB1cGRhdGU6dXNlcnNfYXBwX21ldGFkYXRhIGRlbGV0ZTp1c2Vyc19hcHBfbWV0YWRhdGEgY3JlYXRlOnVzZXJzX2FwcF9tZXRhZGF0YSBjcmVhdGU6dXNlcl90aWNrZXRzIHJlYWQ6Y2xpZW50cyB1cGRhdGU6Y2xpZW50cyBkZWxldGU6Y2xpZW50cyBjcmVhdGU6Y2xpZW50cyByZWFkOmNsaWVudF9rZXlzIHVwZGF0ZTpjbGllbnRfa2V5cyBkZWxldGU6Y2xpZW50X2tleXMgY3JlYXRlOmNsaWVudF9rZXlzIHJlYWQ6Y29ubmVjdGlvbnMgdXBkYXRlOmNvbm5lY3Rpb25zIGRlbGV0ZTpjb25uZWN0aW9ucyBjcmVhdGU6Y29ubmVjdGlvbnMgcmVhZDpyZXNvdXJjZV9zZXJ2ZXJzIHVwZGF0ZTpyZXNvdXJjZV9zZXJ2ZXJzIGRlbGV0ZTpyZXNvdXJjZV9zZXJ2ZXJzIGNyZWF0ZTpyZXNvdXJjZV9zZXJ2ZXJzIHJlYWQ6ZGV2aWNlX2NyZWRlbnRpYWxzIHVwZGF0ZTpkZXZpY2VfY3JlZGVudGlhbHMgZGVsZXRlOmRldmljZV9jcmVkZW50aWFscyBjcmVhdGU6ZGV2aWNlX2NyZWRlbnRpYWxzIHJlYWQ6cnVsZXMgdXBkYXRlOnJ1bGVzIGRlbGV0ZTpydWxlcyBjcmVhdGU6cnVsZXMgcmVhZDpydWxlc19jb25maWdzIHVwZGF0ZTpydWxlc19jb25maWdzIGRlbGV0ZTpydWxlc19jb25maWdzIHJlYWQ6ZW1haWxfcHJvdmlkZXIgdXBkYXRlOmVtYWlsX3Byb3ZpZGVyIGRlbGV0ZTplbWFpbF9wcm92aWRlciBjcmVhdGU6ZW1haWxfcHJvdmlkZXIgYmxhY2tsaXN0OnRva2VucyByZWFkOnN0YXRzIHJlYWQ6dGVuYW50X3NldHRpbmdzIHVwZGF0ZTp0ZW5hbnRfc2V0dGluZ3MgcmVhZDpsb2dzIHJlYWQ6c2hpZWxkcyBjcmVhdGU6c2hpZWxkcyBkZWxldGU6c2hpZWxkcyB1cGRhdGU6dHJpZ2dlcnMgcmVhZDp0cmlnZ2VycyByZWFkOmdyYW50cyBkZWxldGU6Z3JhbnRzIHJlYWQ6Z3VhcmRpYW5fZmFjdG9ycyB1cGRhdGU6Z3VhcmRpYW5fZmFjdG9ycyByZWFkOmd1YXJkaWFuX2Vucm9sbG1lbnRzIGRlbGV0ZTpndWFyZGlhbl9lbnJvbGxtZW50cyBjcmVhdGU6Z3VhcmRpYW5fZW5yb2xsbWVudF90aWNrZXRzIHJlYWQ6dXNlcl9pZHBfdG9rZW5zIGNyZWF0ZTpwYXNzd29yZHNfY2hlY2tpbmdfam9iIGRlbGV0ZTpwYXNzd29yZHNfY2hlY2tpbmdfam9iIHJlYWQ6Y3VzdG9tX2RvbWFpbnMgZGVsZXRlOmN1c3RvbV9kb21haW5zIGNyZWF0ZTpjdXN0b21fZG9tYWlucyByZWFkOmVtYWlsX3RlbXBsYXRlcyBjcmVhdGU6ZW1haWxfdGVtcGxhdGVzIHVwZGF0ZTplbWFpbF90ZW1wbGF0ZXMiLCJndHkiOiJjbGllbnQtY3JlZGVudGlhbHMifQ.K0Gpk1RK1IXgVEBiRbxID3HQtXgy7k7MfVlemnxt4zG30OMLlpD9S_j0JJ4kiSyIwlE9CRzJ5UJgW_VZKtXYtgA2oBLtSJmi4jQWNfstmrWh3s2PnHsdmGpiVAOvC6sWvcy2GKh6u9uUZLoaDj9zBt9K12wSssWAAO7e7CNbYkkiOTfehVwngEmKTRfI280pFugv1NH1OrRGk0HyU6onUrfkG3EiPkq3HvolGIx9hwjfsSh9aB_pezHOPfzGm5xYsHkHIJaCGGKjIsSGpZPQEpnl5Qc2pMzfRfhTg8MV0PKax2wyuJanZEGJD4V-kw4-FA30n1SrBh9P3zhyvRvmQw"
-        }
-    };
-
-  	return new Promise(function (resolve, reject) {
-	    axios.patch(url, params, headers)
-	    .then(function (response) {
-	        resolve(response);
-	    })
-	    .catch(function (error) {
-	        return handleError(error, reject);
-	    });
-  	});
+      axios.patch(url, params, headers)
+      .then(function (response) {
+          resolve(response);
+      })
+      .catch(function (error) {
+          return handleError(error, reject);
+      });
+    }, function() {
+      return reject();
+    });
+  });
 }
 
 /**
@@ -113,26 +140,27 @@ exports.patch = function(url, params){
 * @param [params] [object] [Data that pass to url]
 */
 exports.delete = function(url){
-
-    url = process.env.AUTH0_DOMAIN + url;
-
-  	var headers = {
-        headers: {
-          Authorization: "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik56WTRSREpHUkRjM1FVSkRNekkxTkVSRE5ETXhNa1kyTnpNd04wVTFNVFEzTWtZMU5VVkNNUSJ9.eyJpc3MiOiJodHRwczovL2RkeC5hdXRoMC5jb20vIiwic3ViIjoiMndOTm1ldFpBZDFNbmtmanVYVWpMTlY2TzJJUEJjZVFAY2xpZW50cyIsImF1ZCI6Imh0dHBzOi8vZGR4LmF1dGgwLmNvbS9hcGkvdjIvIiwiaWF0IjoxNTQyMDMwMDkxLCJleHAiOjE1NDIxMTY0OTEsImF6cCI6IjJ3Tk5tZXRaQWQxTW5rZmp1WFVqTE5WNk8ySVBCY2VRIiwic2NvcGUiOiJyZWFkOmNsaWVudF9ncmFudHMgY3JlYXRlOmNsaWVudF9ncmFudHMgZGVsZXRlOmNsaWVudF9ncmFudHMgdXBkYXRlOmNsaWVudF9ncmFudHMgcmVhZDp1c2VycyB1cGRhdGU6dXNlcnMgZGVsZXRlOnVzZXJzIGNyZWF0ZTp1c2VycyByZWFkOnVzZXJzX2FwcF9tZXRhZGF0YSB1cGRhdGU6dXNlcnNfYXBwX21ldGFkYXRhIGRlbGV0ZTp1c2Vyc19hcHBfbWV0YWRhdGEgY3JlYXRlOnVzZXJzX2FwcF9tZXRhZGF0YSBjcmVhdGU6dXNlcl90aWNrZXRzIHJlYWQ6Y2xpZW50cyB1cGRhdGU6Y2xpZW50cyBkZWxldGU6Y2xpZW50cyBjcmVhdGU6Y2xpZW50cyByZWFkOmNsaWVudF9rZXlzIHVwZGF0ZTpjbGllbnRfa2V5cyBkZWxldGU6Y2xpZW50X2tleXMgY3JlYXRlOmNsaWVudF9rZXlzIHJlYWQ6Y29ubmVjdGlvbnMgdXBkYXRlOmNvbm5lY3Rpb25zIGRlbGV0ZTpjb25uZWN0aW9ucyBjcmVhdGU6Y29ubmVjdGlvbnMgcmVhZDpyZXNvdXJjZV9zZXJ2ZXJzIHVwZGF0ZTpyZXNvdXJjZV9zZXJ2ZXJzIGRlbGV0ZTpyZXNvdXJjZV9zZXJ2ZXJzIGNyZWF0ZTpyZXNvdXJjZV9zZXJ2ZXJzIHJlYWQ6ZGV2aWNlX2NyZWRlbnRpYWxzIHVwZGF0ZTpkZXZpY2VfY3JlZGVudGlhbHMgZGVsZXRlOmRldmljZV9jcmVkZW50aWFscyBjcmVhdGU6ZGV2aWNlX2NyZWRlbnRpYWxzIHJlYWQ6cnVsZXMgdXBkYXRlOnJ1bGVzIGRlbGV0ZTpydWxlcyBjcmVhdGU6cnVsZXMgcmVhZDpydWxlc19jb25maWdzIHVwZGF0ZTpydWxlc19jb25maWdzIGRlbGV0ZTpydWxlc19jb25maWdzIHJlYWQ6ZW1haWxfcHJvdmlkZXIgdXBkYXRlOmVtYWlsX3Byb3ZpZGVyIGRlbGV0ZTplbWFpbF9wcm92aWRlciBjcmVhdGU6ZW1haWxfcHJvdmlkZXIgYmxhY2tsaXN0OnRva2VucyByZWFkOnN0YXRzIHJlYWQ6dGVuYW50X3NldHRpbmdzIHVwZGF0ZTp0ZW5hbnRfc2V0dGluZ3MgcmVhZDpsb2dzIHJlYWQ6c2hpZWxkcyBjcmVhdGU6c2hpZWxkcyBkZWxldGU6c2hpZWxkcyB1cGRhdGU6dHJpZ2dlcnMgcmVhZDp0cmlnZ2VycyByZWFkOmdyYW50cyBkZWxldGU6Z3JhbnRzIHJlYWQ6Z3VhcmRpYW5fZmFjdG9ycyB1cGRhdGU6Z3VhcmRpYW5fZmFjdG9ycyByZWFkOmd1YXJkaWFuX2Vucm9sbG1lbnRzIGRlbGV0ZTpndWFyZGlhbl9lbnJvbGxtZW50cyBjcmVhdGU6Z3VhcmRpYW5fZW5yb2xsbWVudF90aWNrZXRzIHJlYWQ6dXNlcl9pZHBfdG9rZW5zIGNyZWF0ZTpwYXNzd29yZHNfY2hlY2tpbmdfam9iIGRlbGV0ZTpwYXNzd29yZHNfY2hlY2tpbmdfam9iIHJlYWQ6Y3VzdG9tX2RvbWFpbnMgZGVsZXRlOmN1c3RvbV9kb21haW5zIGNyZWF0ZTpjdXN0b21fZG9tYWlucyByZWFkOmVtYWlsX3RlbXBsYXRlcyBjcmVhdGU6ZW1haWxfdGVtcGxhdGVzIHVwZGF0ZTplbWFpbF90ZW1wbGF0ZXMiLCJndHkiOiJjbGllbnQtY3JlZGVudGlhbHMifQ.dIIBatUxymu-w0AQPHsmI4KDjo2_QUfshPVWZu-BPOr3EgwRIJmeiPFfS03bJi6fb8NoHUHQnHsNvv3iJ8RJhAVfy24OvpoUXBRZ8oJN8qs0RxaALVpLT6xCmwhq_7MC1Rc2s2D70cl-SZhZxMNuAT8Liw1zS8zDk_-cRdHWqBv5fFuRjKpkN23exN4oahJm6PgqFgvmbm98lP-BcS3YaK6pevfC1A9goRqMwaCdyCqxLKDsRP0pMQAcX8yYLntY0kxRb8DGUaSVpspgGNZ-SrszjI9YFJxi7TlEZfY-ds98QnHi8KgkDVnKAKfH1Soa47UxAzMRO_pRuktdh9kJOA"
-        }
-    };
-
-  	return new Promise(function (resolve, reject) {
-	    axios.delete(url, headers)
-	    .then(function (response) {
-	        resolve(response);
-	    })
-	    .catch(function (error) {
-	        return handleError(error, reject);
-	    });
-  	});
+  return new Promise(function (resolve, reject) {
+    getManagementToken().then(function(success) {
+      url = process.env.AUTH0_DOMAIN + url;
+      var headers = {
+          headers: {
+            Authorization: success
+          }
+      };
+      
+      axios.delete(url, headers)
+      .then(function (response) {
+          resolve(response);
+      })
+      .catch(function (error) {
+          return handleError(error, reject);
+      });
+    }, function() {
+      return reject();
+    });
+  });
 }
-
 
 
 /**
@@ -141,5 +169,70 @@ exports.delete = function(url){
  * @param error [Api Error]
  */
 handleError = function(error, reject) {
-  	return reject(error);
+  return reject(error);
+}
+
+/**
+ * Return Management Token for Auth0 API request
+ */
+getManagementToken = function() {
+  return new Promise(function (resolve, reject) {
+    management.getTokenFromDB().then((success)=> {
+        if(success.length > 0) {
+          if(isManagementTokenValid(success[0])) {
+            resolve("Bearer " + success[0].meta_value);
+          }else {
+            getManagementTokenAuth0().then(function(success) {
+              var token = success.data.access_token;
+              management.updateTokenInDB(token, new Date().toString()).then(function(success) {
+                resolve("Bearer " + token);
+              }, function(err) {
+                reject(null);
+              });
+            }, function(err) {
+              reject(null);
+            });
+          }
+        }else {
+          reject(null);
+        }
+    }, (err) => {
+      reject(null);
+    })
+  });
+}
+
+isManagementTokenValid = function(data) {
+  var startDateTime = new Date(data.meta_options);
+  var currentDateTime = new Date();
+  var seconds = (currentDateTime.getTime() - startDateTime.getTime()) / 1000;
+
+  //Token valid for 24 hours only
+  if(startDateTime && currentDateTime && Math.abs(Math.floor(seconds)) < 86400 - 1000) {
+    return true
+  }
+
+  return false;
+}
+
+/**
+ * Get new token from auth0 for global use
+ */ 
+getManagementTokenAuth0 = function() {
+  var url = process.env.AUTH0_DOMAIN + '/oauth/token';
+  var data = {
+    client_id: process.env.API_CLIENT_ID,
+    client_secret: process.env.API_CLIENT_SECRET,
+    audience: process.env.AUTH0_DOMAIN + '/api/v2/',
+    grant_type: 'client_credentials'
+  };
+  return new Promise(function (resolve, reject) {
+    axios.post(url, data)
+    .then(function (response) {
+        resolve(response);
+    })
+    .catch(function (error) {
+        return handleError(error, reject);
+    });
+  });
 }
