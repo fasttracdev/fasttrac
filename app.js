@@ -11,6 +11,7 @@ const Auth0Strategy = require('passport-auth0');
 const flash = require('connect-flash');
 const paginate = require('express-paginate');
 const manageToken = require('./src/services/manage-token');
+const rules  = require('./src/services/rules');
 var cors = require('cors')
 
 dotenv.load();
@@ -82,14 +83,26 @@ app.use(function(req, res, next) {
  next();
 });
 
-// Check logged in
+// Middleware of api request
 app.use(function(req, res, next) {
+  for (var i = 0; i < rules.skipRoutesRule.length; i++) {
+    if (req.url === rules.skipRoutesRule[i]) {
+      next();
+      return;
+    }
+  }
+
   // check header or url parameters or post parameters for token
   var token = req.body.token || req.query.token || req.headers['authorization'];
   if(typeof token === 'undefined' || token === '' || token === null) {
     return res.status(401).json({ errors: 'User not authorized' });
   }else {
-    manageToken.validateToken(token).then(function(success) {
+    var splitTokenRes = token.split(" ");
+    if(splitTokenRes.length < 2) {
+      return res.status(401).json({ errors: 'User not authorized' });
+    };
+
+    manageToken.validateToken(splitTokenRes[1]).then(function(success) {
       next();
     }, function(err) {
       return res.status(401).json({ errors: 'User not authorized' });

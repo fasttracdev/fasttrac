@@ -5,3 +5,9 @@ let passwordGeneratorRule = {
     strict: true
 };
 exports.passwordGeneratorRule = passwordGeneratorRule;
+
+
+let skipRoutesRule = [
+	'/sso-login/'
+];
+exports.skipRoutesRule = skipRoutesRule;
