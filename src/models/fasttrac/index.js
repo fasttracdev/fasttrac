@@ -1,21 +1,31 @@
 const con = require('../../../connection');
 
 /* Get drivers listing from fasttrac db */ 
-exports.getDriversFromDB = function(query){
+exports.getDriversFromDB = function(query, dataType){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let sql = "select * from fast_trac_drivers where fasttrac_driver_num like '"+'%'+query+'%'+"'";
-        let params = [
-            query
-        ];
-        db.run(sql, params, function(err) {
+        let sql = "";
+        let params = [];
+        if(dataType === 'string') {
+          sql = "select * from fast_trac_drivers where reference_name like ?";
+          params = [
+            '%'+ query +'%'
+          ];
+        }else if(dataType === 'number') {
+          sql = "select * from fast_trac_drivers where fasttrac_driver_num like ?";
+          params = [
+            '%'+ query +'%'
+          ];
+        }else {
+          sql = "select * from fast_trac_drivers";  
+        }
+        db.all(sql, params, function(err, row) {
             if (err) {
                 console.log(err);
                 reject(err);
                 return
             }
-
-            resolve();
+            resolve(row);
         });
         db.close();
     });
