@@ -15,7 +15,7 @@ exports.loginUser = function(req, res, next){
         client_id: process.env.AUTH0_CLIENT_ID,
         client_secret: process.env.AUTH0_CLIENT_SECRET,
         code: req.body.code,
-        redirect_uri: 'http://localhost:8000/callback'
+        redirect_uri: process.env.APP_BASE_URL + '/callback'
     };
     https.postForExternalRequest('/oauth/token', data).then((success)=> {
         var userToken = success.data;
