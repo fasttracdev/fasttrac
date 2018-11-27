@@ -2,7 +2,7 @@ const { validationResult } = require('express-validator/check');
 const paginate = require("paginate-array");
 const fasttracTablesDB = require('../../models/fasttrac');
 const https = require('../../services/https');
-const driversTrans = require('../../transformers/FasttracDriverTransFormers');
+const driversTrans = require('../../transformers/FasttracDriverTransformers');
 
 exports.getDrivers = function(req, res, next){
     const errors = validationResult(req);
