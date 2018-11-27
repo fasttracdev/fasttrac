@@ -9,5 +9,6 @@ var fasttacController = require('../controllers/fasttrac/index.js');
 /* Fasttac routes */
 router.get('/drivers', fasttacController.getDrivers);
 router.get('/sync-drivers', fasttacController.syncDrivers);
+router.get('/sync-driver-report', fasttacController.syncDriverReport);
 
 module.exports = router;

@@ -107,3 +107,93 @@ exports.insertDriverintoDB = function (data) {
     db.close();
   });
 };
+
+/* Insert drivers data */
+exports.insertDriverReportintoDB = function (data) {
+  return new Promise(function (resolve, reject) {
+    let db = con.connectionDB();
+    try {
+      if (data.length > 0) {
+        data.forEach((value, index) => {
+          console.log(value.week);
+          db.run(`INSERT INTO fast_trac_driver_report (
+            driver_id,
+            drivername,
+            week,
+            del_date,
+            selling_terminal,
+            cntrl,
+            fsu,
+            acct,
+            customer,
+            ref,
+            inv_date,
+            inv,
+            hauling_terminal,
+            chg_code,
+            driverterminal,
+            amount_billed,
+            dr,
+            cust_type,
+            line_haul,
+            line_haul_pay,
+            imputted_fuel,
+            imputted_insurance,
+            total_pay,
+            selling_terminal_pay,
+            shipper,
+            pu_city,
+            pu_state,
+            consignee,
+            de_city,
+            de_state
+          ) 
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+            [
+              value.drivernumber,
+              value.drivername,
+              value.week,
+              value.del_date,
+              value.selling_terminal,
+              value.cntrl,
+              value.fsu,
+              value.acct,
+              value.customer,
+              value.ref,
+              value.inv_date,
+              value.inv,
+              value.hauling_terminal,
+              value.chg_code,
+              value.driverterminal,
+              value.amount_billed,
+              value.dr,
+              value.cust_type,
+              value.line_haul,
+              value.line_haul_pay,
+              value.imputted_fuel,
+              value.imputted_insurance,
+              value.total_pay,
+              value.selling_terminal_pay,
+              value.shipper,
+              value.pu_city,
+              value.pu_state,
+              value.consignee,
+              value.de_city,
+              value.de_state
+            ], function (err) {
+              if (err) {
+                reject(err);
+                return;
+              }
+            });
+        });
+        resolve();
+      } else { }
+    } catch (e) {
+
+    }
+    
+    // close the database connection
+    db.close();
+  });
+};
