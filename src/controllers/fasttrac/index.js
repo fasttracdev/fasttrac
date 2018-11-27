@@ -55,3 +55,24 @@ exports.syncDrivers = function(req, res, next){
         return res.status(422).json({ errors: err });
     })
 };
+
+exports.syncDriverReport = function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
+    https.getForExternalRequest(process.env.API_FASTTRAC_DRIVER_REPORT_SYNC).then((success) => {
+        if (success.data.length > 0) {
+            fasttracTablesDB.insertDriverReportintoDB(success.data).then((success) => {
+                return res.status(200).json({ data: { massage: "Report Sync Completed" } });
+            }, (err) => {
+                return res.status(422).json({ errors: err });
+            })
+        } else {
+            return res.status(200).json({ data: { massage: "Report Sync Completed" } });
+        }
+    }, (err) => {
+        return res.status(422).json({ errors: err });
+    })
+};
