@@ -105,6 +105,14 @@ exports.getAllDrivers = function(req, res, next){
         return res.status(422).json({ errors: errors.array() });
     }
 
+    if (typeof req.query.page === 'undefined' || req.query.page === '' || req.query.page === ' ') {
+        req.query.page = 1;
+    }
+
+    if (typeof req.query.limit === 'undefined' || req.query.limit === '' || req.query.limit === ' ' || req.query.limit === 0) {
+        req.query.limit = 10;
+    }
+
     usersTableDB.getAllDriversFromDB().then((success)=> {
         var link = process.env.APP_BASE_URL + '/user/drivers';
         const paginateCollection = paginate(success, req.query.page, req.query.limit);
