@@ -107,7 +107,7 @@ exports.getAllDrivers = function(req, res, next){
 
     usersTableDB.getAllDriversFromDB().then((success)=> {
         var link = process.env.APP_BASE_URL + '/user/drivers';
-        const paginateCollection = paginate(success);
+        const paginateCollection = paginate(success, req.query.page, req.query.limit);
         return res.status(200).json(driversTrans.transformForPagination(paginateCollection, link));
     }, (err)=> {
          return res.status(422).json({ errors: "Records not updated" });
