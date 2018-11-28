@@ -18,10 +18,12 @@ exports.createUser = function(req, res, next){
         user_metadata: {
             first_name: req.body.first_name,
             last_name: req.body.last_name,
-            role: req.body.role
+            role: req.body.role,
+            driver_id: req.body.driver_id ? req.body.driver_id : 0
         },
         email_verified: true
     };
+
     https.post('/api/v2/users', data).then(function(response) {
         usersTableDB.insertUserIntoDB(response.data).then((success)=> {
             return res.status(200).json({ data: response.data });
@@ -29,7 +31,6 @@ exports.createUser = function(req, res, next){
             return res.status(422).json({ errors: "Records not inserted" });
         });
     }, function(error) {
-        console.log(error);
         return res.status(422).json({ errors: error.response.data });
     })
 };

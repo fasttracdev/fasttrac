@@ -1,28 +1,69 @@
 const con = require('../../../connection');
 
+
+
+/* check email */
+exports.checkEmail = function (driverEmail) {
+    return new Promise(function (resolve, reject) {
+        let db = con.connectionDB();
+        let query = 'select email from users where email=?';
+        db.all(query, [
+            driverEmail.email
+        ], function (err, row) {
+            if (err) {
+                reject(err);
+                return
+            }            
+            resolve(row);
+        });
+        db.close();
+    });
+}
+
+/**
+ * Check driver Id
+ */
+exports.checkDriverId = function (driverId) {
+    return new Promise(function (resolve, reject) {
+        let db = con.connectionDB();
+        let query = 'select driver_id from users where driver_id=?';
+        db.all(query, [
+            driverId.driver_id
+        ], function (err, row) {
+            if (err) {
+                reject(err);
+                return
+            }
+            resolve(row);
+        });
+        db.close();
+    });
+}
+
 /* Create a new user into db */ 
 exports.insertUserIntoDB = function(data){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let sql = 'insert into users(user_id, first_name, last_name, email, profile_image, user_meta) VALUES(?, ?, ?, ?, ?, ?)';
+        let sql = 'insert into users(user_id, first_name, last_name, email, profile_image, user_meta, driver_id) VALUES(?, ?, ?, ?, ?, ?, ?)'
         db.run(sql, [
                 data.user_id,
                 data.user_metadata.first_name, 
                 data.user_metadata.last_name,
                 data.email,
                 data.picture,
-                JSON.stringify(data)
+                JSON.stringify(data),
+                data.user_metadata.driver_id
             ], function(err) {
             if (err) {
                 reject(err);
                 return
-            }
-
+            }    
             resolve();
         });
-        db.close();
     });
 };
+
+
 
 /* Update user into db */
 exports.updateUserIntoDB = function(data){
