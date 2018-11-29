@@ -21,7 +21,6 @@ exports.getDriversFromDB = function(query, dataType){
         }
         db.all(sql, params, function(err, row) {
             if (err) {
-                console.log(err);
                 reject(err);
                 return
             }
@@ -115,7 +114,6 @@ exports.insertDriverReportintoDB = function (data) {
     try {
       if (data.length > 0) {
         data.forEach((value, index) => {
-          console.log(value.week);
           db.run(`INSERT INTO fast_trac_driver_report (
             driver_id,
             drivername,

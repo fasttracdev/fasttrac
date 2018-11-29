@@ -67,7 +67,6 @@ exports.insertUserIntoDB = function(data){
 
 /* Update user into db */
 exports.updateUserIntoDB = function(data){
-    console.log(data);
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
         let sql = 'update users set first_name=?, last_name=?, user_meta=? where user_id=?';

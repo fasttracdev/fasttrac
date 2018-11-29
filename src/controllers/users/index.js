@@ -59,7 +59,6 @@ exports.updateUser = function(req, res, next){
             return res.status(422).json({ errors: "Records not updated" });
         });
     }, function(error) {
-        console.log(error);
         return res.status(422).json({ errors: error.response.data });
     });
 };
@@ -80,7 +79,6 @@ exports.deleteUser = function(req, res, next){
                 });
             })
             .catch(function (error) {
-                console.log(error);
                 return res.status(422).json({ errors: error.response.data });
             });
         }else {
