@@ -31,7 +31,11 @@ exports.createUser = function(req, res, next){
             return res.status(422).json({ errors: "Records not inserted" });
         });
     }, function(error) {
-        return res.status(422).json({ errors: error.response.data });
+        if(error.response.data.statusCode === 409) {
+            return res.status(422).json({ errors: 'E-mail already in use' });
+        }else {
+            return res.status(422).json({ errors: error.response.data });
+        }
     })
 };
 
