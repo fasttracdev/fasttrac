@@ -26,7 +26,16 @@ exports.createUser = function(req, res, next){
 
     https.post('/api/v2/users', data).then(function(response) {
         usersTableDB.insertUserIntoDB(response.data).then((success)=> {
-            return res.status(200).json({ data: response.data });
+            var params = {
+                email: req.body.email,
+                connection: process.env.AUTH0_DB_NAME,
+                client_id: process.env.AUTH0_CLIENT_ID
+            }
+            https.post('/dbconnections/change_password', params).then(function (resp) {
+                return res.status(200).json({ data: response.data });
+            }, function(err) {
+                return res.status(422).json({ errors: err });
+            })
         }, (err) => {
             return res.status(422).json({ errors: "Records not inserted" });
         });
