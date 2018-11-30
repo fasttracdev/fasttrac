@@ -211,3 +211,29 @@ exports.getAllDriversReportFromDB = function () {
     db.close();
   });
 };
+
+exports.getDriverReportFromDB = function (id) {
+  var user_id = String(id);
+  return new Promise(function (resolve, reject) {
+    let db = con.connectionDB();
+    let sql = `SELECT driver_id FROM users WHERE user_id  = ?`;
+    let UserId = user_id;
+    db.get(sql, [UserId], (err, row) => {
+      if (err) {
+        reject(err);
+        return
+      }
+      let sql = `SELECT * FROM fast_trac_driver_report WHERE driver_id  = ?`;
+      db.all(sql, [row.driver_id], (err, row) => {
+        if (err) {
+          reject(err);
+          return
+        }
+        resolve(row);
+      });
+    });
+    // close the database connection
+    db.close();
+  });
+};
+

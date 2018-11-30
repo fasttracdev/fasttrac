@@ -3,6 +3,7 @@ const paginate = require("paginate-array");
 const fasttracTablesDB = require('../../models/fasttrac');
 const https = require('../../services/https');
 const driversTrans = require('../../transformers/FasttracDriverTransformers');
+const manageToken = require('../../services/manage-token');
 
 exports.getDrivers = function(req, res, next){
     const errors = validationResult(req);
@@ -98,4 +99,32 @@ exports.getAllDriversReport = function (req, res, next) {
     }, (err) => {
         return res.status(422).json({ errors: "Records not updated" });
     });
+};
+
+exports.getDriverReport = function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    if (typeof req.query.page === 'undefined' || req.query.page === '' || req.query.page === ' ') {
+        req.query.page = 1;
+    }
+
+    if (typeof req.query.limit === 'undefined' || req.query.limit === '' || req.query.limit === ' ' || req.query.limit === 0) {
+        req.query.limit = 10;
+    }
+    var token = req.headers['authorization'];
+    var splitTokenRes = token.split(" ");
+    manageToken.validateToken(splitTokenRes[1]).then(function (success) {       
+        fasttracTablesDB.getDriverReportFromDB(success.sub).then((success) => {
+            var link = process.env.APP_BASE_URL + '/user/drivers-report';
+            const paginateCollection = paginate(success, req.query.page, req.query.limit);
+            return res.status(200).json(driversTrans.transformForPagination(paginateCollection, link));
+        }, (err) => {
+            return res.status(422).json({ errors: "Records not updated" });
+        });
+    }, function (err) {
+        return res.status(422).json({ errors: "Records not updated" });
+    });
+
 };
