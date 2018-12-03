@@ -18,19 +18,33 @@ exports.createUser = function(req, res, next){
         user_metadata: {
             first_name: req.body.first_name,
             last_name: req.body.last_name,
-            role: req.body.role
+            role: req.body.role,
+            driver_id: req.body.driver_id ? req.body.driver_id : 0
         },
         email_verified: true
     };
+
     https.post('/api/v2/users', data).then(function(response) {
         usersTableDB.insertUserIntoDB(response.data).then((success)=> {
-            return res.status(200).json({ data: response.data });
+            var params = {
+                email: req.body.email,
+                connection: process.env.AUTH0_DB_NAME,
+                client_id: process.env.AUTH0_CLIENT_ID
+            }
+            https.post('/dbconnections/change_password', params).then(function (resp) {
+                return res.status(200).json({ data: response.data });
+            }, function(err) {
+                return res.status(422).json({ errors: err });
+            })
         }, (err) => {
             return res.status(422).json({ errors: "Records not inserted" });
         });
     }, function(error) {
-        console.log(error);
-        return res.status(422).json({ errors: error.response.data });
+        if(error.response.data.statusCode === 409) {
+            return res.status(422).json({ errors: 'E-mail already in use' });
+        }else {
+            return res.status(422).json({ errors: error.response.data });
+        }
     })
 };
 
@@ -54,7 +68,6 @@ exports.updateUser = function(req, res, next){
             return res.status(422).json({ errors: "Records not updated" });
         });
     }, function(error) {
-        console.log(error);
         return res.status(422).json({ errors: error.response.data });
     });
 };
@@ -75,7 +88,6 @@ exports.deleteUser = function(req, res, next){
                 });
             })
             .catch(function (error) {
-                console.log(error);
                 return res.status(422).json({ errors: error.response.data });
             });
         }else {
@@ -104,9 +116,17 @@ exports.getAllDrivers = function(req, res, next){
         return res.status(422).json({ errors: errors.array() });
     }
 
+    if (typeof req.query.page === 'undefined' || req.query.page === '' || req.query.page === ' ') {
+        req.query.page = 1;
+    }
+
+    if (typeof req.query.limit === 'undefined' || req.query.limit === '' || req.query.limit === ' ' || req.query.limit === 0) {
+        req.query.limit = 10;
+    }
+
     usersTableDB.getAllDriversFromDB().then((success)=> {
         var link = process.env.APP_BASE_URL + '/user/drivers';
-        const paginateCollection = paginate(success);
+        const paginateCollection = paginate(success, req.query.page, req.query.limit);
         return res.status(200).json(driversTrans.transformForPagination(paginateCollection, link));
     }, (err)=> {
          return res.status(422).json({ errors: "Records not updated" });

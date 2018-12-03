@@ -1,0 +1,14 @@
+{
+  "dev": {
+    "driver": "sqlite3",
+    "filename": "./db/fasttrac.sqlite3"
+  },
+  "prod": {
+    "driver": "sqlite3",
+    "filename": "./db/fasttrac.sqlite3"
+  },
+  "staging": {
+    "driver": "sqlite3",
+    "filename": "./db/fasttrac.sqlite3"
+  }
+}
