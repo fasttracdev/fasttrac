@@ -237,3 +237,17 @@ exports.getDriverReportFromDB = function (id) {
   });
 };
 
+exports.dowloadFromDB = function () {
+  return new Promise(function (resolve, reject) {
+    let db = con.connectionDB();
+    let sql = 'select * from fast_trac_driver_report';
+    db.all(sql, function (err, row) {
+      if (err) {
+        reject(err);
+        return
+      }
+      resolve(row);
+    });
+    db.close();
+  });
+};
