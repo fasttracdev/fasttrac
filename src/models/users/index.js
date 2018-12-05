@@ -42,9 +42,10 @@ exports.checkDriverId = function (driverId) {
 
 /* Create a new user into db */ 
 exports.insertUserIntoDB = function(data){
+    console.log(data);
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let sql = 'insert into users(user_id, first_name, last_name, email, profile_image, user_meta, driver_id) VALUES(?, ?, ?, ?, ?, ?, ?)'
+        let sql = 'insert into users(user_id, first_name, last_name, email, profile_image, user_meta, driver_id, address, city, phone) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         db.run(sql, [
                 data.user_id,
                 data.user_metadata.first_name, 
@@ -52,7 +53,10 @@ exports.insertUserIntoDB = function(data){
                 data.email,
                 data.picture,
                 JSON.stringify(data),
-                data.user_metadata.driver_id
+                data.user_metadata.driver_id,
+                data.user_metadata.address,
+                data.user_metadata.city,
+                data.user_metadata.phone
             ], function(err) {
             if (err) {
                 reject(err);
@@ -69,14 +73,19 @@ exports.insertUserIntoDB = function(data){
 exports.updateUserIntoDB = function(data){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let sql = 'update users set first_name=?, last_name=?, user_meta=? where user_id=?';
+        let sql = 'update users set first_name=?, last_name=?, user_meta=?, email=?, address=?, city=?, phone=? where user_id=?';
         db.run(sql, [
                 data.user_metadata.first_name, 
                 data.user_metadata.last_name,
                 JSON.stringify(data),
+                data.user_metadata.email,
+                data.user_metadata.address,
+                data.user_metadata.city,
+                data.user_metadata.phone,
                 data.user_id
             ], function(err) {
             if (err) {
+                console.log(err);
                 reject(err);
                 return
             }
@@ -129,13 +138,12 @@ exports.isUserExistIntoDB = function(userID){
 exports.getAllDriversFromDB = function(){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let sql = 'select * from users';
+        let sql = 'select * from users ORDER BY ID DESC';
         db.all(sql, function(err, row) {
             if (err) {
                 reject(err);
                 return
-            }
-            
+            }            
             resolve(row);
         });
         db.close();

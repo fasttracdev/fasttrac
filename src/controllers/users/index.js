@@ -19,7 +19,10 @@ exports.createUser = function(req, res, next){
             first_name: req.body.first_name,
             last_name: req.body.last_name,
             role: req.body.role,
-            driver_id: req.body.driver_id ? req.body.driver_id : 0
+            driver_id: req.body.driver_id ? req.body.driver_id : 0,
+            address: req.body.address,
+            city: req.body.city,
+            phone: req.body.phone
         },
         email_verified: true
     };
@@ -56,7 +59,11 @@ exports.updateUser = function(req, res, next){
     var data = {
         user_metadata: {
             first_name: req.body.first_name,
-            last_name: req.body.last_name
+            last_name: req.body.last_name,
+            email: req.body.email,
+            address: req.body.address,
+            city: req.body.city,
+            phone: req.body.phone
         }
     };
 
