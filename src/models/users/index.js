@@ -42,7 +42,6 @@ exports.checkDriverId = function (driverId) {
 
 /* Create a new user into db */ 
 exports.insertUserIntoDB = function(data){
-    console.log(data);
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
         let sql = 'insert into users(user_id, first_name, last_name, email, profile_image, user_meta, driver_id, address, city, phone) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
@@ -85,7 +84,6 @@ exports.updateUserIntoDB = function(data){
                 data.user_id
             ], function(err) {
             if (err) {
-                console.log(err);
                 reject(err);
                 return
             }
@@ -135,15 +133,20 @@ exports.isUserExistIntoDB = function(userID){
 };
 
 /* Delete user into db */
-exports.getAllDriversFromDB = function(){
+exports.getAllDriversFromDB = function(data){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let sql = 'select * from users ORDER BY ID DESC';
+        let sql
+        if (Object.keys(data).length > 0) {
+            sql = 'select * from users ORDER BY ' + data.field_name + ' ' + data.order;
+        }else {
+            sql = 'select * from users';
+        }
         db.all(sql, function(err, row) {
             if (err) {
                 reject(err);
                 return
-            }            
+            }  
             resolve(row);
         });
         db.close();

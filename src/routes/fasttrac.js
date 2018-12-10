@@ -12,6 +12,7 @@ router.get('/sync-drivers', fasttacController.syncDrivers);
 router.get('/sync-driver-report', fasttacController.syncDriverReport);
 router.get('/drivers-report', fasttacController.getAllDriversReport);
 router.get('/driver-report', fasttacController.getDriverReport);
-router.get('/download-drivers-report', fasttacController.ExportDriversReport);
+router.get('/download-drivers-report', fasttacController.exportDriversReport);
+router.get('/download-driver-report', fasttacController.exportDriverReport);
 
 module.exports = router;

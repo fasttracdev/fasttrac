@@ -61,5 +61,6 @@ router.patch('/update/:id', updateUserValidations, userController.updateUser);
 router.delete('/delete/:id', userController.deleteUser);
 router.get('/profile/:id', userController.getUserProfile);
 router.get('/drivers', userController.getAllDrivers);
+router.get('/download-drivers', userController.exportDrivers);
 
 module.exports = router;
