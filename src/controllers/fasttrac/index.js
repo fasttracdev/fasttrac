@@ -116,7 +116,7 @@ exports.getDriverReport = function (req, res, next) {
     }
     var token = req.headers['authorization'];
     var splitTokenRes = token.split(" ");
-    manageToken.validateToken(splitTokenRes[1]).then(function (success) {       
+    manageToken.validateToken(splitTokenRes[1]).then(function (success) {
         fasttracTablesDB.getDriverReportFromDB(success.sub, req.query).then((success) => {
             var link = process.env.APP_BASE_URL + '/user/drivers-report';
             const paginateCollection = paginate(success, req.query.page, req.query.limit);
@@ -132,13 +132,13 @@ exports.getDriverReport = function (req, res, next) {
 
 /**
  * Export Driver Report
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
  */
 exports.exportDriversReport = function (req, res, next) {
     const errors = validationResult(req);
-    fasttracTablesDB.getAllDriversReportFromDB({}).then((success) => {   
+    fasttracTablesDB.getAllDriversReportFromDB({}).then((success) => {
         res.writeHead(200, {
             'Content-Type': 'text/csv',
             'Content-Disposition': 'attachment; filename=Report.csv'

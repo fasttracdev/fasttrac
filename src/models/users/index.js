@@ -13,7 +13,7 @@ exports.checkEmail = function (driverEmail) {
             if (err) {
                 reject(err);
                 return
-            }            
+            }
             resolve(row);
         });
         db.close();
@@ -40,14 +40,14 @@ exports.checkDriverId = function (driverId) {
     });
 }
 
-/* Create a new user into db */ 
+/* Create a new user into db */
 exports.insertUserIntoDB = function(data){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
         let sql = 'insert into users(user_id, first_name, last_name, email, profile_image, user_meta, driver_id, address, city, phone) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         db.run(sql, [
                 data.user_id,
-                data.user_metadata.first_name, 
+                data.user_metadata.first_name,
                 data.user_metadata.last_name,
                 data.email,
                 data.picture,
@@ -60,7 +60,7 @@ exports.insertUserIntoDB = function(data){
             if (err) {
                 reject(err);
                 return
-            }    
+            }
             resolve();
         });
     });
@@ -74,7 +74,7 @@ exports.updateUserIntoDB = function(data){
         let db = con.connectionDB();
         let sql = 'update users set first_name=?, last_name=?, user_meta=?, email=?, address=?, city=?, phone=? where user_id=?';
         db.run(sql, [
-                data.user_metadata.first_name, 
+                data.user_metadata.first_name,
                 data.user_metadata.last_name,
                 JSON.stringify(data),
                 data.user_metadata.email,
@@ -125,7 +125,7 @@ exports.isUserExistIntoDB = function(userID){
                 reject(err);
                 return
             }
-            
+
             resolve(row);
         });
         db.close();
@@ -136,17 +136,21 @@ exports.isUserExistIntoDB = function(userID){
 exports.getAllDriversFromDB = function(data){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let sql
-        if (Object.keys(data).length > 0) {
-            sql = 'select * from users ORDER BY ' + data.field_name + ' ' + data.order;
-        }else {
-            sql = 'select * from users';
-        }
+        let orderField = ("order_field" in data) ? data.order_field : "id";
+        let orderDir = ("order_dir" in data) ? data.order_dir : "desc";
+
+        let sql = "select * from users WHERE 1=1 ";
+
+        // if("driver_id" in data) {
+            // sql += " driver_id=" + data.driver_id;
+        // }
+
+        sql += " ORDER BY "+ orderField + " " + orderDir;
         db.all(sql, function(err, row) {
             if (err) {
                 reject(err);
                 return
-            }  
+            }
             resolve(row);
         });
         db.close();

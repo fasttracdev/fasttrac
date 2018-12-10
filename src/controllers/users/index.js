@@ -136,15 +136,16 @@ exports.getAllDrivers = function(req, res, next){
         const paginateCollection = paginate(success, req.query.page, req.query.limit);
         return res.status(200).json(driversTrans.transformForPagination(paginateCollection, link));
     }, (err)=> {
-         return res.status(422).json({ errors: "Records not updated" });
+
+        return res.status(422).json({ errors: "Error in SQL query" });
     });
 };
 
 /**
- * Export Driver 
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
+ * Export Driver
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
  */
 exports.exportDrivers = function (req, res, next) {
     const errors = validationResult(req);

@@ -1,6 +1,6 @@
 const con = require('../../../connection');
 
-/* Get drivers listing from fasttrac db */ 
+/* Get drivers listing from fasttrac db */
 exports.getDriversFromDB = function(query, dataType){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
@@ -17,7 +17,7 @@ exports.getDriversFromDB = function(query, dataType){
             '%'+ query +'%'
           ];
         }else {
-          sql = "select * from fast_trac_drivers";  
+          sql = "select * from fast_trac_drivers";
         }
         db.all(sql, params, function(err, row) {
             if (err) {
@@ -59,8 +59,8 @@ exports.insertDriverintoDB = function (data) {
             role,
             driver_status,
             payment_type,
-            created_at) 
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`, 
+            created_at)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
               value.id,
               value.truck_id,
@@ -145,7 +145,7 @@ exports.insertDriverReportintoDB = function (data) {
             consignee,
             de_city,
             de_state
-          ) 
+          )
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
               value.drivernumber,
@@ -190,7 +190,7 @@ exports.insertDriverReportintoDB = function (data) {
     } catch (e) {
 
     }
-    
+
     // close the database connection
     db.close();
   });
@@ -200,12 +200,11 @@ exports.insertDriverReportintoDB = function (data) {
 exports.getAllDriversReportFromDB = function (data) {
   return new Promise(function (resolve, reject) {
     let db = con.connectionDB();
-    let sql = '';
-    if (Object.keys(data).length > 0) {
-      sql = 'select * from fast_trac_driver_report ORDER BY ' + data.field_name + ' ' + data.order;
-    }else {
-      sql = 'select * from fast_trac_driver_report'
-    }
+    let orderField = ("order_field" in data) ? data.order_field : "id";
+    let orderDir = ("order_dir" in data) ? data.order_dir : "desc";
+    let sql = 'select * from fast_trac_driver_report WHERE 1=1';
+
+    sql += " ORDER BY "+ orderField + " " + orderDir;
     db.all(sql, function (err, row) {
       if (err) {
         reject(err);
@@ -228,12 +227,11 @@ exports.getDriverReportFromDB = function (id, data) {
         reject(err);
         return
       }
-      let query = '';
-      if (Object.keys(data).length > 0) {
-        query = `SELECT * FROM fast_trac_driver_report WHERE driver_id  = ? ORDER BY ` + data.field_name + ' ' + data.order;
-      }else {
-        query = `SELECT * FROM fast_trac_driver_report WHERE driver_id  = ?`;
-      }
+
+      let orderField = ("order_field" in data) ? data.order_field : "id";
+      let orderDir = ("order_dir" in data) ? data.order_dir : "desc";
+      let query = 'SELECT * FROM fast_trac_driver_report WHERE driver_id  = ? ORDER BY '+orderField + ' ' + orderDir;
+
       db.all(query, [row.driver_id], (err, row) => {
         if (err) {
           reject(err);
