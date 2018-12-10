@@ -197,10 +197,15 @@ exports.insertDriverReportintoDB = function (data) {
 };
 
 
-exports.getAllDriversReportFromDB = function () {
+exports.getAllDriversReportFromDB = function (data) {
   return new Promise(function (resolve, reject) {
     let db = con.connectionDB();
-    let sql = 'select * from fast_trac_driver_report';
+    let sql = '';
+    if (Object.keys(data).length > 0) {
+      sql = 'select * from fast_trac_driver_report ORDER BY ' + data.field_name + ' ' + data.order;
+    }else {
+      sql = 'select * from fast_trac_driver_report'
+    }
     db.all(sql, function (err, row) {
       if (err) {
         reject(err);
@@ -212,7 +217,7 @@ exports.getAllDriversReportFromDB = function () {
   });
 };
 
-exports.getDriverReportFromDB = function (id) {
+exports.getDriverReportFromDB = function (id, data) {
   var user_id = String(id);
   return new Promise(function (resolve, reject) {
     let db = con.connectionDB();
@@ -223,8 +228,13 @@ exports.getDriverReportFromDB = function (id) {
         reject(err);
         return
       }
-      let sql = `SELECT * FROM fast_trac_driver_report WHERE driver_id  = ?`;
-      db.all(sql, [row.driver_id], (err, row) => {
+      let query = '';
+      if (Object.keys(data).length > 0) {
+        query = `SELECT * FROM fast_trac_driver_report WHERE driver_id  = ? ORDER BY ` + data.field_name + ' ' + data.order;
+      }else {
+        query = `SELECT * FROM fast_trac_driver_report WHERE driver_id  = ?`;
+      }
+      db.all(query, [row.driver_id], (err, row) => {
         if (err) {
           reject(err);
           return
@@ -233,21 +243,6 @@ exports.getDriverReportFromDB = function (id) {
       });
     });
     // close the database connection
-    db.close();
-  });
-};
-
-exports.dowloadFromDB = function () {
-  return new Promise(function (resolve, reject) {
-    let db = con.connectionDB();
-    let sql = 'select * from fast_trac_driver_report';
-    db.all(sql, function (err, row) {
-      if (err) {
-        reject(err);
-        return
-      }
-      resolve(row);
-    });
     db.close();
   });
 };

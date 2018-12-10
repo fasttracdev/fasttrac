@@ -5,7 +5,7 @@ const usersTableDB = require('../../models/users');
 const rules  = require('../../services/rules');
 const https = require('../../services/https');
 const driversTrans = require('../../transformers/AdminDriversTransformers');
-
+const helper = require('../../services/helper.service');
 exports.createUser = function(req, res, next){
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -131,7 +131,7 @@ exports.getAllDrivers = function(req, res, next){
         req.query.limit = 10;
     }
 
-    usersTableDB.getAllDriversFromDB().then((success)=> {
+    usersTableDB.getAllDriversFromDB(req.query).then((success)=> {
         var link = process.env.APP_BASE_URL + '/user/drivers';
         const paginateCollection = paginate(success, req.query.page, req.query.limit);
         return res.status(200).json(driversTrans.transformForPagination(paginateCollection, link));
@@ -139,3 +139,23 @@ exports.getAllDrivers = function(req, res, next){
          return res.status(422).json({ errors: "Records not updated" });
     });
 };
+
+/**
+ * Export Driver 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.exportDrivers = function (req, res, next) {
+    const errors = validationResult(req);
+    usersTableDB.getAllDriversFromDB({}).then((success) => {
+        res.writeHead(200, {
+            'Content-Type': 'text/csv',
+            'Content-Disposition': 'attachment; filename=Report.csv'
+        });
+        res.end(helper.driverToCSV(success), "binary");
+        return res.status(200).json({ data: { massage: "Report Downloaded" } });
+    }, (err) => {
+        return res.status(422).json({ errors: err });
+    })
+}
