@@ -203,7 +203,18 @@ exports.getAllDriversReportFromDB = function (data) {
     let orderField = ("order_field" in data) ? data.order_field : "id";
     let orderDir = ("order_dir" in data) ? data.order_dir : "desc";
     let sql = 'select * from fast_trac_driver_report WHERE 1=1';
-
+    if ("driver_id" in data) {
+      sql += " AND driver_id=" + data.driver_id;
+    }
+    if ("ref" in data) {
+      sql += " AND ref like '%" + data.ref + "%'";
+    }
+    if ("driver_name" in data) {
+      sql += " AND drivername like '%" + data.driver_name + "%'";
+    }
+    if ("customer" in data) {
+      sql += " AND customer like '%" + data.customer + "%'";
+    }
     sql += " ORDER BY "+ orderField + " " + orderDir;
     db.all(sql, function (err, row) {
       if (err) {
@@ -227,11 +238,16 @@ exports.getDriverReportFromDB = function (id, data) {
         reject(err);
         return
       }
-
       let orderField = ("order_field" in data) ? data.order_field : "id";
       let orderDir = ("order_dir" in data) ? data.order_dir : "desc";
-      let query = 'SELECT * FROM fast_trac_driver_report WHERE driver_id  = ? ORDER BY '+orderField + ' ' + orderDir;
-
+      let query = 'SELECT * FROM fast_trac_driver_report WHERE driver_id  = ?';
+      if ("ref" in data) {
+        query += " AND ref like '%" + data.ref + "%'";
+      }
+      if ("customer" in data) {
+        query += " AND customer like '%" + data.customer + "%'";
+      }
+      query += " ORDER BY " + orderField + " " + orderDir;
       db.all(query, [row.driver_id], (err, row) => {
         if (err) {
           reject(err);
