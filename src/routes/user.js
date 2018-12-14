@@ -30,6 +30,10 @@ var updateUserValidations = [
 		.not().isEmpty()
 ];
 
+var createEmailvalidation = [
+	check('email').not().isEmpty().withMessage('Email is required.').isEmail().withMessage('Invalid email address.')
+];
+
 /**
  * Unique Email
  * @param {*} email 
@@ -62,6 +66,6 @@ router.delete('/delete/:id', userController.deleteUser);
 router.get('/profile/:id', userController.getUserProfile);
 router.get('/drivers', userController.getAllDrivers);
 router.get('/download-drivers', userController.exportDrivers);
-router.post('/forgot-password', userController.resetPassword);
+router.post('/forgot-password', createEmailvalidation, userController.resetPassword);
 
 module.exports = router;
