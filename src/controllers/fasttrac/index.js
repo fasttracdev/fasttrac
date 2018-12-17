@@ -33,7 +33,7 @@ exports.getDrivers = function(req, res, next){
         const paginateCollection = paginate(success, req.query.page, req.query.limit);
         return res.status(200).json(driversTrans.transformForPagination(paginateCollection, link));
     }, (err)=> {
-         return res.status(422).json({ errors: "Records not updated" });
+        return res.status(422).json({ errors: err });
     });
 };
 
@@ -98,7 +98,7 @@ exports.getAllDriversReport = function (req, res, next) {
         const paginateCollection = paginate(success, req.query.page, req.query.limit);
         return res.status(200).json(driversTrans.transformForPagination(paginateCollection, link));
     }, (err) => {
-        return res.status(422).json({ errors: "Records not updated" });
+        return res.status(422).json({ errors: err });
     });
 };
 
@@ -122,10 +122,10 @@ exports.getDriverReport = function (req, res, next) {
             const paginateCollection = paginate(success, req.query.page, req.query.limit);
             return res.status(200).json(driversTrans.transformForPagination(paginateCollection, link));
         }, (err) => {
-            return res.status(422).json({ errors: "Records not updated" });
+            return res.status(422).json({ errors: err });
         });
     }, function (err) {
-        return res.status(422).json({ errors: "Records not updated" });
+        return res.status(422).json({ errors: err });
     });
 
 };
@@ -164,10 +164,10 @@ exports.exportDriverReport = function (req, res, next) {
             res.end(helper.reportdataToCSV(success), "binary");
             return res.status(200).json({ data: { massage: "Report Downloaded" } });
         }, (err) => {
-            return res.status(422).json({ errors: "Records not downloaded" });
+            return res.status(422).json({ errors: err });
         });
     }, function (err) {
-        return res.status(422).json({ errors: "Records not downloaded" });
+        return res.status(422).json({ errors: err });
     });
 };
 
