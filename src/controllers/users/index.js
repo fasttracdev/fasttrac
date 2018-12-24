@@ -149,7 +149,7 @@ exports.getAllDrivers = function(req, res, next){
  */
 exports.exportDrivers = function (req, res, next) {
     const errors = validationResult(req);
-    usersTableDB.getAllDriversFromDB({}).then((success) => {
+    usersTableDB.getAllDriversFromDB(req.query).then((success) => {
         res.writeHead(200, {
             'Content-Type': 'text/csv',
             'Content-Disposition': 'attachment; filename=Report.csv'
@@ -160,3 +160,30 @@ exports.exportDrivers = function (req, res, next) {
         return res.status(422).json({ errors: err });
     })
 }
+
+exports.resetPassword = function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    var data = {
+        email: req.body.email,
+    };
+    usersTableDB.checkEmailInDB(data).then((success) => {
+        if(success.length <= 0) {
+            return res.status(422).json({ errors: "Email does not exist in our record." });
+        }
+        var params = {
+            email: req.body.email,
+            connection: process.env.AUTH0_DB_NAME,
+            client_id: process.env.AUTH0_CLIENT_ID,
+        }
+        https.post('/dbconnections/change_password', params).then(function (resp) {
+            return res.status(200).json({ data: resp.data });
+        }, function (err) {
+            return res.status(422).json({ errors: err });
+        })
+    }, (err) => {
+        return res.status(422).json({ errors: err });
+    });
+};

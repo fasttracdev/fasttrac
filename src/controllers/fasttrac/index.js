@@ -138,7 +138,7 @@ exports.getDriverReport = function (req, res, next) {
  */
 exports.exportDriversReport = function (req, res, next) {
     const errors = validationResult(req);
-    fasttracTablesDB.getAllDriversReportFromDB({}).then((success) => {
+    fasttracTablesDB.getAllDriversReportFromDB(req.query).then((success) => {
         res.writeHead(200, {
             'Content-Type': 'text/csv',
             'Content-Disposition': 'attachment; filename=Report.csv'
@@ -156,7 +156,7 @@ exports.exportDriverReport = function (req, res, next) {
     var token = req.query.token;
     var splitTokenRes = token.split(" ");
     manageToken.validateToken(splitTokenRes[1]).then(function (success) {
-        fasttracTablesDB.getDriverReportFromDB(success.sub, {}).then((success) => {
+        fasttracTablesDB.getDriverReportFromDB(success.sub, req.query).then((success) => {
             res.writeHead(200, {
                 'Content-Type': 'text/csv',
                 'Content-Disposition': 'attachment; filename=Report.csv'

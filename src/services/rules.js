@@ -9,6 +9,8 @@ exports.passwordGeneratorRule = passwordGeneratorRule;
 
 let skipRoutesRule = [
 	'/sso-login/',
-	'/'
+    '/',
+    '/user/forgot-password'
+    
 ];
 exports.skipRoutesRule = skipRoutesRule;

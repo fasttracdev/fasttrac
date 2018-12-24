@@ -113,7 +113,7 @@ exports.deleteUserFromDB = function(userID){
     });
 };
 
-/* Delete user into db */
+/* Check User */
 exports.isUserExistIntoDB = function(userID){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
@@ -132,21 +132,43 @@ exports.isUserExistIntoDB = function(userID){
     });
 };
 
-/* Delete user into db */
+/* Get All Drivers*/
 exports.getAllDriversFromDB = function(data){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
         let orderField = ("order_field" in data) ? data.order_field : "id";
         let orderDir = ("order_dir" in data) ? data.order_dir : "desc";
-
         let sql = "select * from users WHERE 1=1 ";
-
-        // if("driver_id" in data) {
-            // sql += " driver_id=" + data.driver_id;
-        // }
-
+        if("driver_id" in data) {
+            sql += " AND driver_id=" + data.driver_id;
+        }
+        if ("email" in data) {
+            sql += " AND email like '%" + data.email + "%'";
+        }
+        if ("driver_name" in data) {
+            sql += "AND first_name like '%" + data.driver_name + "%'";
+        }
         sql += " ORDER BY "+ orderField + " " + orderDir;
         db.all(sql, function(err, row) {
+            if (err) {
+                reject(err);
+                return
+            }
+            resolve(row);
+        });
+        db.close();
+    });
+};
+
+/* Check Email */
+exports.checkEmailInDB = function (data) {
+    return new Promise(function (resolve, reject) {
+        let db = con.connectionDB();
+        let sql = "select email from users WHERE 1=1 ";
+        if ("email" in data) {
+            sql += " AND email=" + "'"+data.email+"'";
+        }
+        db.all(sql, function (err, row) {
             if (err) {
                 reject(err);
                 return
