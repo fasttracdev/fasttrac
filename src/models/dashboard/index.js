@@ -17,7 +17,6 @@ exports.getDashBoardContent = function () {
       });
     } catch (e) {
     }
-    // close the database connection
     db.close();
   });
 };

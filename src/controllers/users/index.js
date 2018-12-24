@@ -6,6 +6,13 @@ const rules  = require('../../services/rules');
 const https = require('../../services/https');
 const driversTrans = require('../../transformers/AdminDriversTransformers');
 const helper = require('../../services/helper.service');
+
+/**
+ * Create New User
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 exports.createUser = function(req, res, next){
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -40,7 +47,7 @@ exports.createUser = function(req, res, next){
                 return res.status(422).json({ errors: err });
             })
         }, (err) => {
-            return res.status(422).json({ errors: "Records not inserted" });
+            return res.status(422).json({ errors: "Record could not be inserted" });
         });
     }, function(error) {
         if(error.response.data.statusCode === 409) {
@@ -50,7 +57,12 @@ exports.createUser = function(req, res, next){
         }
     })
 };
-
+/**
+ * Update User Record
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 exports.updateUser = function(req, res, next){
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -72,13 +84,19 @@ exports.updateUser = function(req, res, next){
         usersTableDB.updateUserIntoDB(response.data).then((success)=> {
             return res.status(200).json({ data: response.data });
         }, (err) => {
-            return res.status(422).json({ errors: "Records not updated" });
+            return res.status(422).json({ errors: "Record could not be updated" });
         });
     }, function(error) {
         return res.status(422).json({ errors: error.response.data });
     });
 };
 
+/**
+ * Delete User
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 exports.deleteUser = function(req, res, next){
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -91,7 +109,7 @@ exports.deleteUser = function(req, res, next){
                 usersTableDB.deleteUserFromDB(req.params.id).then((success)=> {
                     return res.status(200).json({ data: response.data });
                 }, (err) => {
-                    return res.status(422).json({ errors: "Records not updated" });
+                    return res.status(422).json({ errors: "Record could not be Deleted" });
                 });
             })
             .catch(function (error) {
@@ -105,6 +123,12 @@ exports.deleteUser = function(req, res, next){
     });
 };
 
+/**
+ * Get User Profile
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 exports.getUserProfile = function(req, res, next){
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -113,10 +137,16 @@ exports.getUserProfile = function(req, res, next){
     usersTableDB.isUserExistIntoDB(req.params.id).then((success)=> {
         return res.status(200).json({ data: JSON.parse(success[0].user_meta) });
     }, (err) => {
-        return res.status(422).json({ errors: "Records not updated" });
+        return res.status(422).json({ errors: "User not found" });
     })
 };
 
+/**
+ * Get All drivers
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 exports.getAllDrivers = function(req, res, next){
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -136,7 +166,6 @@ exports.getAllDrivers = function(req, res, next){
         const paginateCollection = paginate(success, req.query.page, req.query.limit);
         return res.status(200).json(driversTrans.transformForPagination(paginateCollection, link));
     }, (err)=> {
-
         return res.status(422).json({ errors: "Error in SQL query" });
     });
 };
@@ -161,6 +190,12 @@ exports.exportDrivers = function (req, res, next) {
     })
 }
 
+/**
+ * Reset Password
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 exports.resetPassword = function (req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
