@@ -6,17 +6,15 @@ const con = require('../../../connection');
 exports.checkEmail = function (driverEmail) {
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let query = 'select email from users where email=?';
-        db.all(query, [
-            driverEmail.email
-        ], function (err, row) {
+        let query = "select email from users WHERE 1=1 ";
+        query += " AND email='" + driverEmail.email + "'";
+        db.query(query, function (err, res) {
             if (err) {
                 reject(err);
-                return
+                return;
             }
-            resolve(row);
+            resolve(res.rows);
         });
-        db.close();
     });
 }
 
@@ -26,17 +24,15 @@ exports.checkEmail = function (driverEmail) {
 exports.checkDriverId = function (driverId) {
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let query = 'select driver_id from users where driver_id=?';
-        db.all(query, [
-            driverId.driver_id
-        ], function (err, row) {
+        let query = "select driver_id from users WHERE 1=1 ";
+        query += " AND driver_id='" + driverId.driver_id + "'";
+        db.query(query, function (err, res) {
             if (err) {
                 reject(err);
-                return
+                return;
             }
-            resolve(row);
+            resolve(res.rows);
         });
-        db.close();
     });
 }
 
@@ -44,25 +40,14 @@ exports.checkDriverId = function (driverId) {
 exports.insertUserIntoDB = function(data){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let sql = 'insert into users(user_id, first_name, last_name, email, profile_image, user_meta, driver_id, address, city, phone) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-        db.run(sql, [
-                data.user_id,
-                data.user_metadata.first_name,
-                data.user_metadata.last_name,
-                data.email,
-                data.picture,
-                JSON.stringify(data),
-                data.user_metadata.driver_id,
-                data.user_metadata.address,
-                data.user_metadata.city,
-                data.user_metadata.phone
-            ], function(err) {
+        let query = "insert into users(user_id, first_name, last_name, email, profile_image, user_meta, driver_id, address, city, phone) VALUES('" + data.user_id + "', '" + data.user_metadata.first_name + "','" + data.user_metadata.last_name + "','" + data.email + "','" + data.picture + "','" + JSON.stringify(data) + "', '" + data.user_metadata.driver_id + "', '" + data.user_metadata.address + "', '" + data.user_metadata.city + "', '" + data.user_metadata.phone+"')";
+        db.query(query, function (err, res) {
             if (err) {
                 reject(err);
-                return
+                return;
             }
             resolve();
-        });
+        });       
     });
 };
 
@@ -72,25 +57,21 @@ exports.insertUserIntoDB = function(data){
 exports.updateUserIntoDB = function(data){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let sql = 'update users set first_name=?, last_name=?, user_meta=?, email=?, address=?, city=?, phone=? where user_id=?';
-        db.run(sql, [
-                data.user_metadata.first_name,
-                data.user_metadata.last_name,
-                JSON.stringify(data),
-                data.user_metadata.email,
-                data.user_metadata.address,
-                data.user_metadata.city,
-                data.user_metadata.phone,
-                data.user_id
-            ], function(err) {
+        let query = "update users set first_name='" +data.user_metadata.first_name+ "'";
+        query += ",last_name='" +data.user_metadata.last_name+"'";
+        query += ",user_meta='" +JSON.stringify(data)+"'";
+        query += ",email='" +data.user_metadata.email+"'";
+        query += ",address='" +data.user_metadata.address+"'";
+        query += ",city='" + data.user_metadata.city+"'";
+        query += ",phone='" + data.user_metadata.phone+"'";
+        query += "where user_id='" +data.user_id+"'";
+        db.query(query, function (err, res) {
             if (err) {
                 reject(err);
-                return
+                return;
             }
-
-            resolve();
+            resolve(res.rows);
         });
-        db.close();
     });
 };
 
@@ -98,18 +79,14 @@ exports.updateUserIntoDB = function(data){
 exports.deleteUserFromDB = function(userID){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let sql = 'delete from users where user_id=?';
-        db.run(sql, [
-                userID
-            ], function(err) {
+        var query = "delete from users where user_id='" + userID + "'";
+        db.query(query, function (err, res) {
             if (err) {
                 reject(err);
-                return
+                return;
             }
-
-            resolve();
+            resolve(res.rows);
         });
-        db.close();
     });
 };
 
@@ -117,18 +94,15 @@ exports.deleteUserFromDB = function(userID){
 exports.isUserExistIntoDB = function(userID){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let sql = 'select * from users where user_id=?';
-        db.all(sql, [
-                userID
-            ], function(err, row) {
+        let query = "select * from users WHERE 1=1 ";
+        query += " AND user_id='" + userID + "'";
+        db.query(query, function (err, res) {
             if (err) {
                 reject(err);
-                return
+                return;
             }
-
-            resolve(row);
+            resolve(res.rows);
         });
-        db.close();
     });
 };
 
@@ -138,25 +112,24 @@ exports.getAllDriversFromDB = function(data){
         let db = con.connectionDB();
         let orderField = ("order_field" in data) ? data.order_field : "id";
         let orderDir = ("order_dir" in data) ? data.order_dir : "desc";
-        let sql = "select * from users WHERE 1=1 ";
+        let query = "select * from users WHERE 1=1 ";
         if("driver_id" in data) {
-            sql += " AND driver_id=" + data.driver_id;
+            query += " AND driver_id like '%" + data.driver_id + "%'";
         }
         if ("email" in data) {
-            sql += " AND email like '%" + data.email + "%'";
+            query += " AND email like '%" + data.email + "%'";
         }
         if ("driver_name" in data) {
-            sql += "AND first_name like '%" + data.driver_name + "%'";
+            query += "AND first_name like '%" + data.driver_name + "%'";
         }
-        sql += " ORDER BY "+ orderField + " " + orderDir;
-        db.all(sql, function(err, row) {
+        query += " ORDER BY "+ orderField + " " + orderDir;
+        db.query(query, function (err, res) {
             if (err) {
                 reject(err);
-                return
+                return;
             }
-            resolve(row);
+            resolve(res.rows);
         });
-        db.close();
     });
 };
 
@@ -164,17 +137,16 @@ exports.getAllDriversFromDB = function(data){
 exports.checkEmailInDB = function (data) {
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let sql = "select email from users WHERE 1=1 ";
+        let query = "select email from users WHERE 1=1 ";
         if ("email" in data) {
-            sql += " AND email=" + "'"+data.email+"'";
+            query += " AND email=" + "'"+data.email+"'";
         }
-        db.all(sql, function (err, row) {
+        db.query(query, function (err, res) {
             if (err) {
                 reject(err);
-                return
+                return;
             }
-            resolve(row);
+            resolve(res.rows);
         });
-        db.close();
     });
 };

@@ -1,12 +1,17 @@
-/*SqlLite DB*/
-const sqlite3 = require('sqlite3').verbose();
+const { Pool } = require('pg');
+var config = {
+    user: 'postgres',
+    database: 'fasttrac',
+    password: 'root',
+    host: 'localhost',
+    port: 5432,
+    max: 10, // max number of clients in the pool
+    idleTimeoutMillis: 30000
+};
 
 exports.connectionDB = function(){
     // connect the database
-    let db = new sqlite3.Database('./db/fasttrac.sqlite3', sqlite3.OPEN_READWRITE, (err) => {
-        if (err) {
-            console.error("DB Connection not build");
-        }
-    });
+    let  db = new Pool(config);
+    console.log("Connected");
     return db;
 };

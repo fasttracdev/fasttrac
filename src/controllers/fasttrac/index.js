@@ -42,7 +42,6 @@ exports.syncDrivers = function(req, res, next){
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-
     https.getForExternalRequest(process.env.API_FASTTRAC_DRIVER_SYNC).then((success) => {
         if (success.data.length > 0) {
             fasttracTablesDB.insertDriverintoDB(success.data).then((success) => {

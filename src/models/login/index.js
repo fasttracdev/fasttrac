@@ -4,17 +4,14 @@ const con = require('../../../connection');
 exports.getUserFromDB = function(userID){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let sql = 'select * from users where user_id=?';
-        db.all(sql, [
-                userID
-            ], function(err, row) {
+        var query = 'SELECT * from users where 1=1';
+        query += " AND user_id='" + userID +"'";
+        db.query(query, function (err, res) {
             if (err) {
                 reject(err);
                 return;
             }
-            
-            resolve(row);
+            resolve(res.rows);
         });
-        db.close();
     });
 };
