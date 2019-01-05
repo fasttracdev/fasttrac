@@ -127,3 +127,63 @@ exports.getDriverReportFromDB = function (id, data) {
     });
   });
 };
+
+exports.getSettlementReportsFromDB = function (data) {
+  return new Promise(function (resolve, reject) {
+    let db = con.connectionDB();
+    let orderField = ("order_field" in data) ? data.order_field : "id";
+    let orderDir = ("order_dir" in data) ? data.order_dir : "desc";
+    let query = 'select * from fast_trac_driver_report WHERE 1=1';
+    if ("driver_id" in data) {
+      query += " AND driver_id='" + data.driver_id + "'";
+    }
+    if ("terminal" in data) {
+      query += " AND driverterminal='" + data.terminal + "'";
+    }
+    if ("end_del_date" in data) {
+      query += " AND del_date>='" + data.start_del_date + "'";
+      query += " AND del_date<='" + data.end_del_date + "'";
+    }
+    query += " ORDER BY " + orderField + " " + orderDir;
+    db.query(query, function (err, res) {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(res.rows);
+    });
+  });
+};
+
+exports.getSettlementDriverReportsFromDB = function (id, data) {
+  return new Promise(function (resolve, reject) {
+    let db = con.connectionDB();
+    let sql = `SELECT driver_id FROM users WHERE 1=1`;
+    sql += " AND user_id='" + id + "'";
+
+    db.query(sql, function (err, res) {
+      if (err) {
+        reject(err);
+        return
+      }
+      let orderField = ("order_field" in data) ? data.order_field : "id";
+      let orderDir = ("order_dir" in data) ? data.order_dir : "desc";
+      let query = 'SELECT * FROM fast_trac_driver_report WHERE 1=1';
+      query += " AND driver_id='" + res.rows[0].driver_id + "'";
+      
+      if ("end_del_date" in data) {
+        query += " AND del_date>='" + data.start_del_date + "'";
+        query += " AND del_date<='" + data.end_del_date + "'";
+      }
+
+      db.query(query, function (err, res) {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(res.rows);
+      });
+    });
+  });
+};
+

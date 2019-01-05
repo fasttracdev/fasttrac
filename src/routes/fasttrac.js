@@ -14,5 +14,8 @@ router.get('/drivers-report', fasttacController.getAllDriversReport);
 router.get('/driver-report', fasttacController.getDriverReport);
 router.get('/download-drivers-report', fasttacController.exportDriversReport);
 router.get('/download-driver-report', fasttacController.exportDriverReport);
+router.get('/drivers-settlement-report', fasttacController.getSettlementReports);
+router.get('/driver-settlement-report', fasttacController.getSettlementDriverReports);
+
 
 module.exports = router;
