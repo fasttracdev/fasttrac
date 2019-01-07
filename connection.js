@@ -5,7 +5,7 @@ var config = {
     password: 'root',
     host: 'localhost',
     port: 5432,
-    max: 10, // max number of clients in the pool
+    max: 10,
     idleTimeoutMillis: 30000
 };
 
