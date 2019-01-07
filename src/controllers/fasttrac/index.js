@@ -42,7 +42,6 @@ exports.syncDrivers = function(req, res, next){
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-
     https.getForExternalRequest(process.env.API_FASTTRAC_DRIVER_SYNC).then((success) => {
         if (success.data.length > 0) {
             fasttracTablesDB.insertDriverintoDB(success.data).then((success) => {
@@ -171,6 +170,34 @@ exports.exportDriverReport = function (req, res, next) {
     });
 };
 
+exports.getSettlementReports = function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    fasttracTablesDB.getSettlementReportsFromDB(req.query).then((success) => {
+        return res.status(200).json({ data: success });
+    }, (err) => {
+        return res.status(422).json({ errors: err });
+    });
+};
 
+exports.getSettlementDriverReports = function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    var token = req.headers['authorization'];
+    var splitTokenRes = token.split(" ");
+    manageToken.validateToken(splitTokenRes[1]).then(function (success) {
+        fasttracTablesDB.getSettlementDriverReportsFromDB(success.sub, req.query).then((success) => {
+           return res.status(200).json({data: success});
+        }, (err) => {
+            return res.status(422).json({ errors: err });
+        });
+    }, function (err) {
+        return res.status(422).json({ errors: err });
+    });
+};
 
 

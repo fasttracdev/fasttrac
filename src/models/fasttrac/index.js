@@ -1,32 +1,24 @@
 const con = require('../../../connection');
 
-/* Get drivers listing from fasttrac db */
-exports.getDriversFromDB = function(query, dataType){
+/* Get drivers listing from fasttrac db  */
+exports.getDriversFromDB = function(params, dataType){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let sql = "";
-        let params = [];
+        let query = "";
         if(dataType === 'string') {
-          sql = "select * from fast_trac_drivers where reference_name like ?";
-          params = [
-            '%'+ query +'%'
-          ];
+          query = "select * from fast_trac_drivers where reference_name LIKE '%" + params.toUpperCase() + "%'";
         }else if(dataType === 'number') {
-          sql = "select * from fast_trac_drivers where fasttrac_driver_num like ?";
-          params = [
-            '%'+ query +'%'
-          ];
+          query = "select * from fast_trac_drivers where fasttrac_driver_num like '%" + params + "%'";
         }else {
-          sql = "select * from fast_trac_drivers";
+          query = "select * from fast_trac_drivers";
         }
-        db.all(sql, params, function(err, row) {
-            if (err) {
-                reject(err);
-                return
-            }
-            resolve(row);
+        db.query(query, function (err, res) {
+          if (err) {
+            reject(err);
+            return;
+          }
+          resolve(res.rows);
         });
-        db.close();
     });
 };
 
@@ -37,73 +29,19 @@ exports.insertDriverintoDB = function (data) {
     try {
       if (data.length > 0) {
         data.forEach((value, index) => {
-          db.run(`INSERT INTO fast_trac_drivers (
-            ref_id,
-            truck_id,
-            terminal_id,
-            fasttrac_driver_num,
-            payment_rate,
-            stop_payment,
-            owner_operator,
-            phone,
-            reference_name,
-            company_name,
-            address_1,
-            address_2,
-            city,
-            postal_code,
-            fax,
-            email,
-            motor_carrier,
-            notes,
-            role,
-            driver_status,
-            payment_type,
-            created_at)
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-            [
-              value.id,
-              value.truck_id,
-              value.terminal_id,
-              value.fasttrac_driver_num,
-              value.payment_rate,
-              value.stop_payment,
-              value.owner_operator,
-              value.phone,
-              value.reference_name,
-              value.company_name,
-              value.address_1,
-              value.address_2,
-              value.city,
-              value.postal_code,
-              value.fax,
-              value.email,
-              value.motor_carrier,
-              value.notes,
-              value.role,
-              value.driver_status,
-              value.payment_type,
-              value.created_at
-            ], function (err) {
+          let query = "INSERT INTO fast_trac_drivers (ref_id,truck_id,terminal_id,fasttrac_driver_num,payment_rate,stop_payment,owner_operator,phone,reference_name,company_name,address_1,address_2,city,postal_code,fax,email,motor_carrier,notes,role,driver_status,payment_type,created_at)VALUES('"+value.id+"', '"+value.truck_id+"', '"+value.terminal_id+"', '"+value.fasttrac_driver_num+"', '"+value.payment_rate+"', '"+value.stop_payment+"', '"+value.owner_operator+"', '"+value.phone+"', '"+value.reference_name+"', '"+value.company_name+"', '"+value.address_1+"', '"+value.address_2+"', '"+value.city+"', '"+value.postal_code+"', '"+value.fax+"', '"+value.email+"', '"+value.motor_carrier+"', '"+value.notes+"', '"+value.role+"', '"+value.driver_status+"', '"+value.payment_type+"', '"+value.created_a+"')";
+          db.query(query, function (err, res) {
             if (err) {
               reject(err);
               return;
             }
-
-          // console.log((Number(index / data.length)*100) + "% Completed");
-          // console.log(`A row has been inserted with rowid ${this.lastID}`);
+            resolve();
+          });
         });
-        });
-        resolve();
       }else {}
     }catch(e) {
 
     }
-
-    // insert one row into the langs table
-
-    // close the database connection
-    db.close();
   });
 };
 
@@ -114,85 +52,17 @@ exports.insertDriverReportintoDB = function (data) {
     try {
       if (data.length > 0) {
         data.forEach((value, index) => {
-          db.run(`INSERT INTO fast_trac_driver_report (
-            driver_id,
-            drivername,
-            week,
-            del_date,
-            selling_terminal,
-            cntrl,
-            fsu,
-            acct,
-            customer,
-            ref,
-            inv_date,
-            inv,
-            hauling_terminal,
-            chg_code,
-            driverterminal,
-            amount_billed,
-            dr,
-            cust_type,
-            line_haul,
-            line_haul_pay,
-            imputted_fuel,
-            imputted_insurance,
-            total_pay,
-            selling_terminal_pay,
-            shipper,
-            pu_city,
-            pu_state,
-            consignee,
-            de_city,
-            de_state
-          )
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-            [
-              value.drivernumber,
-              value.drivername,
-              value.week,
-              value.del_date,
-              value.selling_terminal,
-              value.cntrl,
-              value.fsu,
-              value.acct,
-              value.customer,
-              value.ref,
-              value.inv_date,
-              value.inv,
-              value.hauling_terminal,
-              value.chg_code,
-              value.driverterminal,
-              value.amount_billed,
-              value.dr,
-              value.cust_type,
-              value.line_haul,
-              value.line_haul_pay,
-              value.imputted_fuel,
-              value.imputted_insurance,
-              value.total_pay,
-              value.selling_terminal_pay,
-              value.shipper,
-              value.pu_city,
-              value.pu_state,
-              value.consignee,
-              value.de_city,
-              value.de_state
-            ], function (err) {
-              if (err) {
-                reject(err);
-                return;
-              }
-            });
+          let query = "INSERT INTO fast_trac_driver_report (driver_id,drivername,week,del_date,selling_terminal,cntrl,fsu,acct,customer,ref,inv_date,inv,hauling_terminal,chg_code,driverterminal,amount_billed,dr,cust_type,line_haul,line_haul_pay,imputted_fuel,imputted_insurance,total_pay,selling_terminal_pay,shipper,pu_city,pu_state,consignee,de_city,de_state)VALUES('"+value.drivernumber+"','"+value.drivername+"','"+value.week+"','"+value.del_date+"','"+value.selling_terminal+"','"+value.cntrl+"','"+value.fsu+"','"+value.acct+"','"+value.customer+"','"+value.ref+"','"+value.inv_date+"','"+value.inv+"','"+value.hauling_terminal+"','"+value.chg_code+"','"+value.driverterminal+"','"+value.amount_billed+"','"+value.dr+"','"+value.cust_type+"','"+value.line_haul+"','"+value.line_haul_pay+"','"+value.imputted_fuel+"','"+value.imputted_insurance+"','"+value.total_pay+"','"+value.selling_terminal_pay+"','"+value.shipper+"','"+value.pu_city+"','"+value.pu_state+"','"+value.consignee+"','"+value.de_city+"','"+value.de_state+"')";
+          db.query(query, function (err, res) {
+            if (err) {
+              reject(err);
+              return;
+            }
+            resolve();
+          });
         });
-        resolve();
       } else { }
-    } catch (e) {
-
-    }
-
-    // close the database connection
-    db.close();
+    } catch (e) {}
   });
 };
 
@@ -202,61 +72,118 @@ exports.getAllDriversReportFromDB = function (data) {
     let db = con.connectionDB();
     let orderField = ("order_field" in data) ? data.order_field : "id";
     let orderDir = ("order_dir" in data) ? data.order_dir : "desc";
-    let sql = 'select * from fast_trac_driver_report WHERE 1=1';
+    let query = 'select * from fast_trac_driver_report WHERE 1=1';
     if ("driver_id" in data) {
-      sql += " AND driver_id=" + data.driver_id;
+      query += " AND driver_id like '%" + data.driver_id + "%'";
     }
-    if ("ref" in data) {
-      sql += " AND ref like '%" + data.ref + "%'";
+    if ("chg_code" in data) {
+      query += " AND chg_code like '%" + data.chg_code + "%'";
     }
     if ("driver_name" in data) {
-      sql += " AND drivername like '%" + data.driver_name + "%'";
+      query += " AND drivername like '%" + data.driver_name + "%'";
     }
     if ("customer" in data) {
-      sql += " AND customer like '%" + data.customer + "%'";
+      query += " AND customer like '%" + data.customer + "%'";
     }
-    sql += " ORDER BY "+ orderField + " " + orderDir;
-    db.all(sql, function (err, row) {
+    query += " ORDER BY "+ orderField + " " + orderDir;
+    db.query(query, function (err, res) {
       if (err) {
         reject(err);
-        return
+        return;
       }
-      resolve(row);
+      resolve(res.rows);
     });
-    db.close();
   });
 };
 
 exports.getDriverReportFromDB = function (id, data) {
-  var user_id = String(id);
   return new Promise(function (resolve, reject) {
     let db = con.connectionDB();
-    let sql = `SELECT driver_id FROM users WHERE user_id  = ?`;
-    let UserId = user_id;
-    db.get(sql, [UserId], (err, row) => {
+    let sql = `SELECT driver_id FROM users WHERE 1=1`;
+    sql += " AND user_id='" + id + "'";
+    db.query(sql, function (err, res) {
       if (err) {
         reject(err);
         return
       }
       let orderField = ("order_field" in data) ? data.order_field : "id";
       let orderDir = ("order_dir" in data) ? data.order_dir : "desc";
-      let query = 'SELECT * FROM fast_trac_driver_report WHERE driver_id  = ?';
-      if ("ref" in data) {
-        query += " AND ref like '%" + data.ref + "%'";
+      let query = 'SELECT * FROM fast_trac_driver_report WHERE 1=1';
+      query += " AND driver_id='" + res.rows[0].driver_id + "'";
+      if ("chg_code" in data) {
+        query += " AND chg_code like '%" + data.chg_code + "%'";
       }
       if ("customer" in data) {
         query += " AND customer like '%" + data.customer + "%'";
       }
       query += " ORDER BY " + orderField + " " + orderDir;
-      db.all(query, [row.driver_id], (err, row) => {
+      db.query(query, function (err, res) {
         if (err) {
           reject(err);
-          return
+          return;
         }
-        resolve(row);
+        resolve(res.rows);
       });
     });
-    // close the database connection
-    db.close();
   });
 };
+
+exports.getSettlementReportsFromDB = function (data) {
+  return new Promise(function (resolve, reject) {
+    let db = con.connectionDB();
+    let orderField = ("order_field" in data) ? data.order_field : "id";
+    let orderDir = ("order_dir" in data) ? data.order_dir : "desc";
+    let query = 'select * from fast_trac_driver_report WHERE 1=1';
+    if ("driver_id" in data) {
+      query += " AND driver_id='" + data.driver_id + "'";
+    }
+    if ("terminal" in data) {
+      query += " AND driverterminal='" + data.terminal + "'";
+    }
+    if ("end_del_date" in data) {
+      query += " AND del_date>='" + data.start_del_date + "'";
+      query += " AND del_date<='" + data.end_del_date + "'";
+    }
+    query += " ORDER BY " + orderField + " " + orderDir;
+    db.query(query, function (err, res) {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(res.rows);
+    });
+  });
+};
+
+exports.getSettlementDriverReportsFromDB = function (id, data) {
+  return new Promise(function (resolve, reject) {
+    let db = con.connectionDB();
+    let sql = `SELECT driver_id FROM users WHERE 1=1`;
+    sql += " AND user_id='" + id + "'";
+
+    db.query(sql, function (err, res) {
+      if (err) {
+        reject(err);
+        return
+      }
+      let orderField = ("order_field" in data) ? data.order_field : "id";
+      let orderDir = ("order_dir" in data) ? data.order_dir : "desc";
+      let query = 'SELECT * FROM fast_trac_driver_report WHERE 1=1';
+      query += " AND driver_id='" + res.rows[0].driver_id + "'";
+      
+      if ("end_del_date" in data) {
+        query += " AND del_date>='" + data.start_del_date + "'";
+        query += " AND del_date<='" + data.end_del_date + "'";
+      }
+
+      db.query(query, function (err, res) {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(res.rows);
+      });
+    });
+  });
+};
+

@@ -39,8 +39,7 @@ exports.get = function(url){
 exports.post = function(url, params){
   return new Promise(function (resolve, reject) {
     getManagementToken().then(function(success) {
-      url = process.env.AUTH0_DOMAIN + url;
-
+      url = process.env.AUTH0_DOMAIN + url;      
       var headers = {
         headers: {
           'Content-Type': 'application/json',
@@ -53,9 +52,10 @@ exports.post = function(url, params){
           resolve(response);
       })
       .catch(function (error) {
-          return handleError(error, reject);
+
+        return handleError(error, reject);
       });
-    }, function() {
+    }, function(eee) {
       return reject();
     });
   });
@@ -178,10 +178,10 @@ handleError = function(error, reject) {
 getManagementToken = function() {
   return new Promise(function (resolve, reject) {
     management.getTokenFromDB().then((success)=> {
-        if(success.length > 0) {
-          if(isManagementTokenValid(success[0])) {
-            resolve("Bearer " + success[0].meta_value);
-          }else {
+      if(success.length > 0) {
+        if(isManagementTokenValid(success[0])) {
+          resolve("Bearer " + success[0].meta_value);
+        }else {
             getManagementTokenAuth0().then(function(success) {
               var token = success.data.access_token;
               management.updateTokenInDB(token, new Date().toString()).then(function(success) {

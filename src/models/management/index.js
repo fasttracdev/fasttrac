@@ -4,16 +4,14 @@ const con = require('../../../connection');
 exports.getTokenFromDB = function(userID){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let sql = 'select * from settings where meta_key="APP_TOKEN"';
-        db.all(sql, [], function(err, row) {
+        let sql = "select * from settings where meta_key='APP_TOKEN'";
+        db.query(sql, function (err, res) {
             if (err) {
                 reject(err);
                 return;
             }
-            
-            resolve(row);
+            resolve(res.rows);
         });
-        db.close();
     });
 };
 
@@ -21,18 +19,15 @@ exports.getTokenFromDB = function(userID){
 exports.updateTokenInDB = function(token, date){
     return new Promise(function (resolve, reject) {
         let db = con.connectionDB();
-        let sql = 'update settings set meta_value=?, meta_options=? where meta_key="APP_TOKEN"';
-        db.all(sql, [
-                token,
-                date
-            ], function(err, row) {
+        let sql = "update settings set meta_value='"+token+"'";
+        sql += ", meta_options='"+date+"'";
+        sql += " where meta_key='APP_TOKEN'";
+        db.query(sql, function (err, res) {
             if (err) {
                 reject(err);
                 return;
             }
-            
-            resolve();
+            resolve(res.rows);
         });
-        db.close();
     });
 };

@@ -10,7 +10,9 @@ exports.passwordGeneratorRule = passwordGeneratorRule;
 let skipRoutesRule = [
 	'/sso-login/',
     '/',
-    '/user/forgot-password'
+    '/user/forgot-password',
+    '/fasttrac/sync-driver-report',
+    '/fasttrac/sync-drivers'
     
 ];
 exports.skipRoutesRule = skipRoutesRule;

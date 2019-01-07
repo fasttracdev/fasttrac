@@ -78,7 +78,6 @@ exports.updateUser = function(req, res, next){
             phone: req.body.phone
         }
     };
-
     https.patch('/api/v2/users/' + req.params.id, data)
     .then(function (response) {
         usersTableDB.updateUserIntoDB(response.data).then((success)=> {
